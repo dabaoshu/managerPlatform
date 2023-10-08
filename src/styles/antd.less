@@ -1,0 +1,108 @@
+@import './vars.less';
+
+@topHeight: 48px;
+@itemHeight: 28px;
+@paddingSize: 24px;
+
+//全局
+.ant-layout {
+  min-height: 100vh;
+}
+.ant-pro-sider.ant-layout-sider.ant-pro-sider-fixed {
+  left: unset;
+}
+// // TODO:临时过渡一下
+// .ant-pro-setting-drawer-handle {
+//   visibility: hidden;
+// }
+
+.ant-pro-basicLayout-content {
+  position: relative;
+  margin: @spacing16;
+  .ant-pro-page-container {
+    margin: -@spacing16 -@spacing16 0;
+  }
+}
+
+.ant-pro-page-container-children-content {
+  margin: @spacing16 @spacing16 0;
+}
+
+.ant-pro-global-footer {
+  margin: 0 0 @spacing16 0;
+}
+
+//ant-drawer
+.ant-drawer-content {
+  // .ant-drawer-body {
+  //   padding: @spacing24; //这个设置其实是默认的
+  //   // padding: 0 @spacing16 ; //这个设置其实是默认的
+  // }
+  .ant-drawer-header {
+    height: @topHeight;
+    padding: 0 @paddingSize;
+  }
+  .ant-drawer-title {
+    line-height: @topHeight;
+  }
+  .ant-drawer-close {
+    height: @topHeight;
+    line-height: @topHeight;
+  }
+}
+
+//ant-modal
+.ant-modal-content {
+  .ant-modal-body {
+    padding: @spacing24; //这个设置其实是默认的
+    // padding: 0 @spacing16 ; //这个设置其实是默认的
+  }
+  .ant-modal-header {
+    height: @topHeight;
+    padding: 0 @paddingSize;
+  }
+  .ant-modal-title {
+    line-height: @topHeight;
+  }
+  .ant-modal-close,
+  .ant-modal-close-x {
+    height: @topHeight;
+    line-height: @topHeight;
+  }
+  .ant-modal-footer {
+    height: @topHeight;
+  }
+}
+
+//ant-form-item
+.ant-form-item {
+  .ant-form-item-label > label {
+    height: @itemHeight;
+  }
+  .ant-form-item-control {
+    min-height: @itemHeight;
+  }
+}
+
+//ant-select
+.ant-select-single:not(.ant-select-customize-input) .ant-select-selector {
+  height: @itemHeight;
+  .ant-select-selection-search-input {
+    height: 26px;
+  }
+}
+.ant-select-single .ant-select-selector .ant-select-selection-item,
+.ant-select-single .ant-select-selector .ant-select-selection-placeholder {
+  line-height: 26px;
+}
+
+//ant-table
+//列表头部筛选
+:where(.css-dev-only-do-not-override-4sxmcs).ant-pro {
+  .ant-pro-query-filter {
+    padding: 16px;
+  }
+  .ant-pro-query-filter-row {
+    row-gap: 16px;
+  }
+}

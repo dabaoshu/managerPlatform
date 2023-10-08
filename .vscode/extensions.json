@@ -1,0 +1,9 @@
+{
+  "recommendations": [
+    "esbenp.prettier-vscode",
+    "dbaeumer.vscode-eslint",
+    "stylelint.vscode-stylelint",
+    "litiany4.umijs-plugin-model",
+    "wangzy.sneak-mark"
+  ]
+}
