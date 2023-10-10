@@ -1,10 +1,9 @@
-import { formatMessage } from './.umi/plugin-locale/localeExports';
 import { message, notification } from 'antd';
 import type { RequestConfig } from 'umi';
 import type { Context } from 'umi-request'
 import { LOCAL_STORAGE, whiteApis } from './constants';
 import loginServer from './module/login.server';
-
+const formatMessage = () => ""
 const httpCodeMsg = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -98,24 +97,26 @@ const whiteApiReqInterceptor = (url: string, options: RequestConfig) => {
   };
 }
 
+
+
+/**理论上这个只捕获有服务器且成功响应的 */
 const responseInterceptor = async (response: Response, options: RequestConfig) => {
   // if (process.env.NODE_ENV === 'development') {
   //   console.log('-----response--options---', options, response);
   // }
-
   if (!response.ok) {
     if (response.status === 401 || response.status === 403) {
       loginServer.logout(false)
-      // window.__POWERED_BY_QIANKUN__ ? (window.location.href = '/#/') : router.replace('/user/login')
-      // history.push(loginPath);
-    } else {
-      const errorText = httpCodeMsg[response.status] || response.statusText;
-      const { status, url } = response;
-      notification.error({
-        message: `请求错误 ${status}: ${url}`,
-        description: errorText,
-      });
     }
+    // else {
+
+    // const errorText = httpCodeMsg[response.status] || response.statusText;
+    // const { status, url } = response;
+    // notification.error({
+    //   message: `请求错误 ${status}: ${url}`,
+    //   description: errorText,
+    // });
+    // }
   }
   return response
 };
@@ -143,7 +144,8 @@ export const hocResponse = <T>(
 
   const msgNewError =
     localErrorTips || resultMsg || formatMessage({ id: 'COMMON_FAILED', defaultMessage: '失败' });
-  const isSuccess = `${resultCode}` === '0';
+  // 雷电
+  const isSuccess = `${resultCode}` === '0000';
 
   if (isSuccess && isShowSuccessTips) message.success(msgNewSuccess);
   if (!isSuccess && isShowErrorTips) message.error(msgNewError);
@@ -180,6 +182,8 @@ const responseHandle = async <T>(ctx: Context, next: () => void) => {
     if (!ctx) return;
     const { handleResp = false, ResponseConfig = {} } = (ctx.req?.options || {}) as responseHandleOptions
     if (handleResp) {
+      console.log(ctx.res);
+
       ctx.res = hocResponse(ctx?.res, ResponseConfig)
       if (window.__logger__) {
         console.log(ctx.res);
@@ -197,5 +201,5 @@ export const requestConfig: RequestConfig = {
   errorHandler,
   requestInterceptors: [requestInterceptor, whiteApiReqInterceptor],
   responseInterceptors: [responseInterceptor],
-  middlewares: [responseAdapterHandle, responseHandle]
+  middlewares: [responseHandle, responseAdapterHandle,]
 };

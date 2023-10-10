@@ -10,5 +10,8 @@
   },
   "[html]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[hosts]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
   }
 }

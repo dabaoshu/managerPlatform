@@ -7,6 +7,8 @@ body,
 #root {
   width: 100%;
   height: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 body {
@@ -32,7 +34,7 @@ a {
   color: @primary-color;
 }
 a:hover {
-  color: @primary-color 60%;
+  color: fade(@primary-color, 60%);
 }
 a:active {
   color: @primary-color;
@@ -53,26 +55,36 @@ canvas {
 //   left: unset;
 // }
 
-@media (max-width: @screen-xs) {
-  .ant-table {
-    width: 100%;
-    overflow-x: auto;
-    &-thead > tr,
-    &-tbody > tr {
-      > th,
-      > td {
-        white-space: pre;
-        > span {
-          display: block;
-        }
-      }
-    }
+// @media (max-width: @screen-xs) {
+//   .ant-table {
+//     width: 100%;
+//     overflow-x: auto;
+//     &-thead > tr,
+//     &-tbody > tr {
+//       > th,
+//       > td {
+//         white-space: pre;
+//         > span {
+//           display: block;
+//         }
+//       }
+//     }
+//   }
+// }
+
+body .ant-pro-layout {
+  .ant-layout > .ant-pro-layout-container {
+    min-height: 100vh;
+  }
+  .ant-pro-sider-logo {
+    padding-inline: 6px;
+    padding-block: 8px;
   }
 }
 
 // Compatible with IE11
 @media screen and(-ms-high-contrast: active), (-ms-high-contrast: none) {
-  body .ant-design-pro > .ant-layout {
+  body .ant-pro-layout .ant-layout > .ant-pro-layout-container {
     min-height: 100vh;
   }
 }

@@ -1,26 +1,48 @@
-import React, { useState } from 'react';
-import { Form, Input, Button, Checkbox } from 'antd';
+import { useRef, useState } from 'react';
+import { Form, Button, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 import styles from './index.less';
 import { useIntl } from 'umi';
 import classNames from 'classnames';
 import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
-const login = () => {};
+import { login } from '@/services/login';
+import { md5Encryption } from '@/utils/encrypt';
+import { useMount } from 'ahooks';
+import loginServer from '@/module/login.server';
+const initPage = '/operation';
 function Login() {
   const { formatMessage } = useIntl();
-  const [username, setUsername] = useState();
   const history = useHistory();
-  const userName = 'root';
+  const userName = 'admin';
+  const redirectRef = useRef('');
+  useMount(() => {
+    const { query = {} } = history.location;
+    const { redirect } = query;
+    redirectRef.current = decodeURIComponent(redirect || initPage);
+  });
   const onFinish = async (values) => {
-    console.log(values);
-
-    // login(values).then((res) => {
-    //   if (res.code === 200) {
-    //     history.push('/home');
-    //     localStorage.setItem('username', username);
-    //   }
-    // });
+    try {
+      const { isSuccess, data } = await login({
+        ...values,
+        password: md5Encryption(values.password),
+      });
+      if (!isSuccess) return;
+      message.success(
+        formatMessage({
+          id: 'user.login.success',
+          defaultMessage: '登录成功！',
+        }),
+      );
+      const { token, username } = data;
+      loginServer.login({
+        userName: username,
+        token: token,
+      });
+      history.push(redirectRef.current);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const onFinishFailed = (errorInfo) => {
@@ -63,11 +85,14 @@ function Login() {
             }}
           >
             <ProFormText
+              formItemProps={{
+                className: styles['login-form-item'],
+              }}
               name="userName"
               disabled
               fieldProps={{
                 size: 'large',
-                className: styles['login-form-item'],
+                className: styles['login-form-item-input'],
                 prefix: <UserOutlined className={styles.prefixIcon} />,
               }}
               rules={[
@@ -78,10 +103,13 @@ function Login() {
               ]}
             />
             <ProFormText.Password
+              formItemProps={{
+                className: styles['login-form-item'],
+              }}
               name="password"
               fieldProps={{
                 size: 'large',
-                className: styles['login-form-item'],
+                className: styles['login-form-item-input'],
                 prefix: <LockOutlined className={styles.prefixIcon} />,
               }}
               placeholder={'密码'}

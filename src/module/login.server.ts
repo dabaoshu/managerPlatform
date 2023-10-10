@@ -24,6 +24,7 @@ class LoginServer {
   login = (data: { token: string, userName: string }) => {
     localStorage.setItem(LOCAL_STORAGE.TOKEN, data.token);
     localStorage.setItem(LOCAL_STORAGE.USERNAME, data.userName);
+    this.currentUser = data
   }
   /**注銷 */
   logout = async (isLogoutNet = true) => {
@@ -41,7 +42,7 @@ class LoginServer {
       history.replace({
         pathname: loginPath,
         search: stringify({
-          redirect: pathname + search,
+          redirect: encodeURIComponent(pathname + search)
         }),
       });
     }

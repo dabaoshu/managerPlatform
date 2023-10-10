@@ -1,57 +1,43 @@
-import { join } from 'path';
 import { defineConfig } from 'umi';
-
 import defaultSettings from './defaultSettings';
 import getProxy from './proxy';
 import routes from './routes';
 import theme from './theme';
 
 const { NODE_ENV, BASE = '/', PUBLIC_PATH = '/' } = process.env;
-console.log("-----NODE_ENV, BASE = '/', PUBLIC_PATH--------", NODE_ENV, BASE, PUBLIC_PATH);
-const isPro = NODE_ENV === 'production';
 
 const ROUTER_BASE = BASE.lastIndexOf('/') === BASE.length - 1 ? BASE : `${BASE}/`;
-const outputDir = 'dist'; // Default: dist 不允许设定为 src、public、pages、mock、config 等约定目录
-const OUTPUT_PATH = PUBLIC_PATH !== '/' ? `${outputDir}${PUBLIC_PATH}` : outputDir;
+// const outputDir = 'dist'; // Default: dist 不允许设定为 src、public、pages、mock、config 等约定目录
+// const OUTPUT_PATH = PUBLIC_PATH !== '/' ? `${outputDir}${PUBLIC_PATH}` : outputDir;
 const serverList = {
   "local": "http://localhost:10010",
+  "dabaoshu": "http://dabaoshda5s4dau.top:6223",
+  "154": 'http://172.21.72.154:8559',
+  "116": 'http://10.45.46.116:8909'
 };
 
-const target = serverList['local']
+const target = serverList['116']
 const proxy = getProxy(NODE_ENV, target)
 
 const define = {
-  isPro,
   BASE,
   ROUTER_BASE,
   PUBLIC_PATH,
-  OUTPUT_PATH,
-  STOMP_URL: isPro ? '/' : target,
+  // OUTPUT_PATH,
 };
-console.log('---define---', JSON.stringify(define));
 
 export default defineConfig({
   define,
   // base: ROUTER_BASE, // / 设置路由前缀，通常用于部署到非根目录。; 设置了OUTPUT_PATH可以不用再设置base hash模式图片路径没有问题
   publicPath: PUBLIC_PATH, // /
-  outputPath: OUTPUT_PATH, // dist/
   hash: true,
   locale: {
     antd: true,
     //默认情况下，当前语言环境的识别按照：localStorage 中 umi_locale 值 > 浏览器检测 > default 设置的默认语言 > 中文
     // default true, when it is true, will use `navigator.language` overwrite default
     baseNavigator: false,
-
   },
-  antd: {
-    // dark: true, // 开启暗色主题
-    compact: true, // 开启紧凑主题
-    // dark: true, // 开启暗色主题
-    // compact: true, // 开启紧凑主题
-    // config: {
-    //   prefixCls: 'bdp',
-    // },
-  },
+  antd: false,
   dva: {
     hmr: true,
     // immer: true,
@@ -75,7 +61,7 @@ export default defineConfig({
   //   javascriptEnabled: true,
   // },
   // devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
-  devtool: isPro ? 'source-map' : 'source-map',
+  // devtool: isPro ? 'source-map' : 'source-map',
   // devtool: 'eval',
   proxy,
   nodeModulesTransform: { type: 'none', exclude: [] },
@@ -88,7 +74,7 @@ export default defineConfig({
     basePath: '/',
   },
   dynamicImport: {
-    loading: '@ant-design/pro-layout/es/PageLoading',
+    loading: '@/components/PageLoading',
   },
   targets: {
     ie: 11,
@@ -117,19 +103,6 @@ export default defineConfig({
   //     },
   //   });
   // },
-  openAPI: [
-    {
-      requestLibPath: "import { request } from 'umi'",
-      // 或者使用在线的版本 schemaPath: "https://gw.alipayobjects.com/os/antfincdn/M%24jrzTTYJN/oneapi.json"
-      schemaPath: join(__dirname, 'oneapi.json'),
-      mock: false,
-    },
-    // {
-    //   requestLibPath: "import { request } from 'umi'",
-    //   schemaPath: 'https://gw.alipayobjects.com/os/antfincdn/CA1dOm%2631B/openapi.json',
-    //   projectName: 'swagger',
-    // },
-  ],
   // qiankun: {
   //   master: {
   //     apps: [

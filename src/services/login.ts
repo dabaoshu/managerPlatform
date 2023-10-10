@@ -16,7 +16,7 @@ namespace LoginParams {
 
 /** 登录 */
 export async function login(body: LoginParams.login['req'], options = {}) {
-  return request<API.BaseRes<LoginParams.login['res']>>(`login`, {
+  return request<API.BaseRes<LoginParams.login['res']>>(`/api/login`, {
     method: 'POST',
     data: body,
     ...(options || {}),
