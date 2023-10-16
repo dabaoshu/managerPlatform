@@ -173,6 +173,9 @@ type responseHandleOptions = {
 const responseAdapterHandle = async <T>(ctx: Context, next: () => void) => {
   return (next as any)().then(() => {
     if (!ctx) return;
+    if (ctx?.res?.retCode === "5020" || ctx?.res?.retCode === "5022") {
+      loginServer.logout(false)
+    }
     ctx.res = AdapterHandle(ctx?.res)
   })
 };
@@ -180,10 +183,8 @@ const responseAdapterHandle = async <T>(ctx: Context, next: () => void) => {
 const responseHandle = async <T>(ctx: Context, next: () => void) => {
   return (next as any)().then(() => {
     if (!ctx) return;
-    const { handleResp = false, ResponseConfig = {} } = (ctx.req?.options || {}) as responseHandleOptions
+    const { handleResp = true, ResponseConfig = {} } = (ctx.req?.options || {}) as responseHandleOptions
     if (handleResp) {
-      console.log(ctx.res);
-
       ctx.res = hocResponse(ctx?.res, ResponseConfig)
       if (window.__logger__) {
         console.log(ctx.res);

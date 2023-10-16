@@ -1,5 +1,4 @@
 import { defineConfig } from 'umi';
-import defaultSettings from './defaultSettings';
 import getProxy from './proxy';
 import routes from './routes';
 import theme from './theme';
@@ -45,11 +44,7 @@ export default defineConfig({
     // disableModelsReExport: true,
     // lazyLoad: true,
   },
-  layout: {
-    locale: true,
-    siderWidth: 208,
-    ...defaultSettings,
-  },
+  layout: false,
   title: false,
   ignoreMomentLocale: true,
   // targets: {
@@ -60,7 +55,7 @@ export default defineConfig({
   // lessLoaderOptions: {
   //   javascriptEnabled: true,
   // },
-  // devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
+  devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
   // devtool: isPro ? 'source-map' : 'source-map',
   // devtool: 'eval',
   proxy,

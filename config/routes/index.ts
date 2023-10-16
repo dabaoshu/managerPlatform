@@ -35,33 +35,56 @@ export interface MenuDataItem {
 
 
 const routes: MenuDataItem[] = [
-  {
-    path: '/',
-    // redirect: "/user/login"
-    // redirect: '/home',
-  },
   userRoutes,
+  // {
+  //   path: '/',
+  //   component: '@/layouts/CommonLayout/CommonTokenLayout',
+  //   routes: [userRoutes], exact: true
+  // },
   {
     path: '/',
     component: '@/layouts/CommonLayout',
     flatMenu: true,
     routes: [
       {
+        path: '/',
+        redirect: './home',
+      },
+      {
+        name: '集群',
+        icon: 'setting',
+        path: '/home',
+        component: './home',
+        hideInMenu: true,
+      },
+      {
+        name: '新建/接管集群',
+        path: '/new',
+        component: './new',
+        hideInMenu: true,
+      },
+      {
         name: '集群',
         icon: 'setting',
         path: '/operation',
         component: './operation',
         hideChildrenInMenu: true,
+        // redirect: './operation/overview',
         routes: [
           {
             path: '/operation',
-            redirect: './operation/overview',
+            redirect: './overview',
           },
+
           {
             name: '监控',
-            icon: 'user',
             path: '/operation/overview',
             component: './operation/overview',
+          },
+          {
+            name: '节点',
+            path: '/operation/nodes',
+            component: './operation/nodes',
           },
         ],
       },

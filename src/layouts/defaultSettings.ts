@@ -29,8 +29,8 @@ export const layoutToken = {
     colorActiveBarWidth: 0,
     colorActiveBarHeight: 0,
     colorActiveBarBorderSize: 0,
-    colorTextMenuItemHover: token.colorPrimary,
-    colorTextMenuSelected: token.colorPrimary,
+    colorTextMenuItemHover: `rgba(0, 0, 0, 0.65)`,
+    colorTextMenuSelected: `${token.colorPrimary} !important`,
     colorTextMenuActive: token.colorPrimary,
     colorBgMenuItemCollapsedElevated: '#fff',
   },
@@ -45,8 +45,8 @@ export type LocalLayoutSettings = LayoutSettings & {
 };
 
 const layoutSettings: LocalLayoutSettings = {
-  logoIcon: './logo.png',
-  logo: './logo-head.png',
+  logoIcon: '/logo.png',
+  logo: '/logo-head.png',
   title: '浩鲸大数据平台', //产品名，默认值为包名。
   slogan: '基于云原生、物理机等环境下,构建业界主流hadoop大数据平台', //另外加的
   iconfontUrl: '',

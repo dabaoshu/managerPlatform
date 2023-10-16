@@ -1,0 +1,119 @@
+.MenuHeader {
+  display: flex;
+  width: 100%;
+  &.active,
+  &:hover {
+    background-color: #dce8fc;
+    border-radius: 6px;
+  }
+  .logo {
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+  }
+  .cluster-name {
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: space-between;
+    margin-left: 1px;
+    overflow: hidden;
+    color: rgb(76, 87, 108);
+    font-weight: 500;
+    font-size: 14px;
+    -webkit-box-align: center;
+    -webkit-box-pack: justify;
+    .text {
+      flex: 1 1 0%;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+    }
+  }
+}
+
+.action-icon {
+}
+
+.popoverContent {
+  .cluster-item-box {
+    display: flex;
+    height: 75px;
+    padding: 12px 16px;
+    &:hover {
+      background-color: rgb(247, 249, 254);
+      cursor: pointer;
+    }
+    .cluster-item-current {
+      width: 14px;
+      margin-top: 3px;
+    }
+    .cluster-item {
+      flex: 1 1 0%;
+      padding-left: 12px;
+      .cluster-item-info {
+        display: flex;
+        flex: 1 1 0%;
+        overflow: hidden;
+      }
+      .cluster-item-info-name {
+        flex: 1 1 0%;
+        overflow: hidden;
+        color: rgb(32, 45, 64);
+        font-weight: 500;
+        font-size: 16px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+      }
+      .cluster-item-status {
+        margin-left: 16px;
+        :global {
+          .ant-badge-status-dot {
+            width: 8px;
+            height: 8px;
+          }
+
+          .ant-badge-status-success {
+            background-color: #52c41a;
+            &::after {
+              position: absolute;
+              top: 0px;
+              left: 0px;
+              width: 100%;
+              height: 100%;
+              border: 1px solid rgb(0, 180, 42);
+              border-radius: 50%;
+              animation: 1.2s ease-in-out 0s infinite normal none running antStatusProcessing;
+              content: '';
+            }
+          }
+        }
+      }
+
+      .cluster-item-version {
+        margin-top: 4px;
+        color: rgb(133, 146, 166);
+      }
+    }
+  }
+
+  .cluster-list {
+    max-height: 375px;
+    overflow-y: auto;
+  }
+
+  .action {
+    display: block;
+    padding: 12px 16px;
+    color: rgb(32, 45, 64);
+    cursor: pointer;
+    &:hover {
+      background-color: rgb(247, 249, 254);
+    }
+  }
+}

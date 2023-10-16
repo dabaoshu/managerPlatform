@@ -23,10 +23,12 @@ function Login() {
   });
   const onFinish = async (values) => {
     try {
-      const { isSuccess, data } = await login({
+      const { isSuccess, data, ...s } = await login({
         ...values,
         password: md5Encryption(values.password),
       });
+      console.log(s);
+
       if (!isSuccess) return;
       message.success(
         formatMessage({

@@ -38,7 +38,7 @@ class LoginServer {
     } catch (error) {
       console.log(error);
     }
-    if (window.location.pathname !== loginPath && !redirect) {
+    if (history.location.pathname !== loginPath && !redirect) {
       history.replace({
         pathname: loginPath,
         search: stringify({
