@@ -17,7 +17,7 @@ const CommonTokenLayout: React.FC<IRouteComponentProps> = ({ children, location,
     } else if (initialState?.currentUser || loginServer.token) {
       setReady(true);
     }
-
+    return;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location.pathname, location.pathname?.search]);
 

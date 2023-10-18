@@ -6,9 +6,15 @@ const createUrl = '/api/v1/deploy/ck';
 export const ClusterApi = {
   getCluster: () => request<API.BaseRes>(`${url}/cluster`, {
     method: 'GET',
-
-
   }),
+  /**new */
+  checkhost: (payload) => request<API.BaseRes>(`/api/v1/deploy/checkhost`, {
+    method: 'POST',
+    data: {
+      ...payload
+    }
+  }),
+  /**未使用 */
   getClusterByName(clusterName: string) {
     return request(`${url}/cluster/${clusterName}`, {
       method: 'GET', handleResp: true

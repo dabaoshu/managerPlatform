@@ -1,0 +1,20 @@
+@topHeight: 48px;
+@bottomHeight: 48px;
+@paddingSize: 24px;
+@buttons-spacing: 8px;
+.Footer {
+  padding: 0 @paddingSize;
+  width: 100%;
+  border-top: 1px solid rgba(0, 0, 0, 0.09);
+  background: #fff;
+  height: @bottomHeight;
+  display: flex;
+  align-items: center;
+
+  button:not(:first-child) {
+    margin-left: @buttons-spacing;
+  }
+  .RightBtnGroup {
+    margin-left: auto;
+  }
+}

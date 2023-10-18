@@ -5,8 +5,6 @@ import MenuHeader from '@/components/MenuRender/MenuHeader';
 
 import styles from './index.less';
 import { Link, useModel } from 'umi';
-import { DefaultFooter } from '@ant-design/pro-components';
-import { useIntl } from 'umi';
 import { transformRoute, getMatchMenu } from '@umijs/route-utils';
 import { useMemo } from 'react';
 import { WithExceptionOpChildren } from '@/components/Exception';
@@ -58,6 +56,7 @@ export default (props) => {
       height: '100%',
       overflow: 'auto',
     },
+    disableMobile: true,
     menuItemRender: (menuItemProps, defaultDom) => {
       if (menuItemProps.isUrl) {
         return defaultDom;
@@ -90,7 +89,7 @@ export default (props) => {
           // unAccessible={userConfig?.unAccessible}
           currentPathConfig={currentPathConfig}
         >
-          {children}
+          <div className={styles.right}>{children}</div>
         </WithExceptionOpChildren>
       </ProLayout>
     </div>

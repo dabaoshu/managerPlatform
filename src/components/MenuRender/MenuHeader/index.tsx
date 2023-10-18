@@ -1,24 +1,20 @@
-import {
-  CheckCircleFilled,
-  DownOutlined,
-  LogoutOutlined,
-  PlusOutlined,
-  UpOutlined,
-} from '@ant-design/icons';
-import { Badge, Button, Divider, Popover, Space } from 'antd';
+import { CheckCircleFilled, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
+import { Badge, Divider, Popover, Space, Tooltip } from 'antd';
 import { useMemo, useState } from 'react';
 import styles from './index.less';
-import { Link, useHistory, useModel } from 'umi';
+import { Link, useModel } from 'umi';
 import classnames from 'classnames';
 import loginServer from '@/module/login.server';
+import ExpandIcon from '@/components/expandIcon';
 // import ThreeHexagonsIcon from ''
 
-const ClusterBadge = ({ className, active }) => {
+export const ClusterBadge = ({ className = '', item }) => {
   const { text, status } = useMemo(() => {
+    const active = !!item;
     return active ? { status: 'success', text: '运行中' } : { status: 'default', text: '失效' };
-  }, [active]);
+  }, [item]);
 
-  return <Badge className={classnames(className)} status={status} text={text}></Badge>;
+  return <Badge className={classnames(className)} status={status} text={text} />;
 };
 
 const ClusterItem = ({ item, active }) => {
@@ -30,16 +26,23 @@ const ClusterItem = ({ item, active }) => {
       <div className={styles['cluster-item']}>
         <div className={styles['cluster-item-info']}>
           <div className={styles['cluster-item-info-name']}>{item.cluster}</div>
-          <ClusterBadge active={true} className={styles['cluster-item-status']} />
+          <ClusterBadge item={item} className={styles['cluster-item-status']} />
         </div>
-        <div className={styles['cluster-item-version']}>{item.version}</div>
+        <div className={styles['cluster-item-version']}>
+          {item.pkgName}-{item.version}
+        </div>
       </div>
     </div>
   );
 };
 
 export default function MenuHeader(props) {
-  const { title, logo } = props;
+  const {
+    title,
+    logo,
+    props: { collapsed },
+  } = props;
+
   const [open, setOpen] = useState(false);
   const [{ loadingEffects, clusterList, currentCluster }, { setState }] = useModel('clusterModel');
   console.log('clusterList', clusterList);
@@ -65,9 +68,7 @@ export default function MenuHeader(props) {
       <div className={styles.popoverContent}>
         <div className={styles['cluster-box']}>
           <div className={styles['cluster-list']}>
-            {currentCluster.cluster && (
-              <ClusterItem item={currentCluster} active={true}></ClusterItem>
-            )}
+            {currentCluster.cluster && <ClusterItem item={currentCluster} active={true} />}
             {list.map((o) => {
               return <ClusterItem key={o.cluster} item={o} active={false} />;
             })}
@@ -105,13 +106,22 @@ export default function MenuHeader(props) {
       }}
       arrow={false}
     >
-      <div className={classnames(styles.MenuHeader, { [styles['active']]: open })}>
-        <div className={styles['logo']}>{logo}</div>
-        <div className={styles['cluster-name']}>
-          <div className={styles['text']}>{currentCluster.cluster}</div>
-          <span className={styles['action-icon']}>{open ? <UpOutlined /> : <DownOutlined />}</span>
+      <Tooltip title={`当前集群:${currentCluster?.cluster}`}>
+        <div
+          className={classnames(styles.MenuHeader, {
+            [styles.active]: open,
+            [styles.collapsed]: collapsed,
+          })}
+        >
+          <div className={styles.logo}>{logo}</div>
+          {!collapsed && (
+            <div className={styles['cluster-name']}>
+              <div className={styles.text}>{currentCluster?.cluster}</div>
+              <ExpandIcon open={open} />
+            </div>
+          )}
         </div>
-      </div>
+      </Tooltip>
     </Popover>
   );
 }

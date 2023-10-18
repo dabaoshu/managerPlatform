@@ -7,7 +7,7 @@ const useClusterModel =
       clusterList: [],
       currentCluster: undefined
     })
-    const { loading: getClusterLoading, runAsync: getCluster } = useRequest(ClusterApi.getCluster, {
+    const { loading: getClusterLoading, runAsync: getCluster, } = useRequest(ClusterApi.getCluster, {
       manual: true,
     })
     // const getClusterLoading = false

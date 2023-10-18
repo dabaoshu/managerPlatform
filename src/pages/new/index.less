@@ -3,3 +3,83 @@
   font-weight: 500;
   font-size: 20px;
 }
+.content {
+  width: 50%;
+  margin-bottom: 32px;
+  @media screen and (max-width: 1440px) {
+    width: 60%;
+  }
+}
+.steps {
+  margin-bottom: 32px;
+}
+.footer {
+  button {
+    min-width: 134px;
+  }
+}
+.RadioButton {
+  display: flex;
+  width: 100%;
+  > label {
+    display: flex;
+    flex: 1 1 0%;
+    align-items: center;
+    justify-content: center;
+    min-width: 148px;
+    min-height: 34px;
+    margin: 4px;
+    padding: 0px 8px;
+    color: rgb(32, 45, 64);
+    border: 1px solid rgb(223, 229, 240);
+    border-radius: 6px;
+    -webkit-box-align: center;
+    -webkit-box-pack: center;
+    &:not(:first-child)::before {
+      width: 0;
+    }
+  }
+}
+.nodeUserConfig {
+  display: flex;
+  width: 100%;
+}
+
+.NodeConfig {
+  .Row {
+    width: 760px;
+  }
+}
+.formlist {
+  .row {
+    position: relative;
+    padding: 8px 0px;
+    &.formlistheader {
+      padding-top: 4px;
+    }
+    &::after {
+      position: absolute;
+      right: 8px;
+      bottom: 0px;
+      left: 8px;
+      display: block;
+      height: 0.5px;
+      background-color: rgb(223, 229, 240);
+      content: '';
+    }
+  }
+  :global {
+    .ant-form-item {
+      margin-bottom: 0px;
+    }
+  }
+}
+.primaryText {
+  color: rgb(0, 101, 253);
+  font-size: 14px;
+  cursor: pointer;
+}
+.nodeStatusBox {
+  display: flex;
+  align-items: center;
+}

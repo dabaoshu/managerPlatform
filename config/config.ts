@@ -12,10 +12,11 @@ const serverList = {
   "local": "http://localhost:10010",
   "dabaoshu": "http://dabaoshda5s4dau.top:6223",
   "154": 'http://172.21.72.154:8559',
-  "116": 'http://10.45.46.116:8909'
+  "116": 'http://10.45.46.116:8909',
+  "1162": 'http://10.45.46.116:8910'
 };
 
-const target = serverList['116']
+const target = serverList['1162']
 const proxy = getProxy(NODE_ENV, target)
 
 const define = {
@@ -55,8 +56,8 @@ export default defineConfig({
   // lessLoaderOptions: {
   //   javascriptEnabled: true,
   // },
-  devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
-  // devtool: isPro ? 'source-map' : 'source-map',
+  // devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
+  devtool: NODE_ENV === 'production' ? 'source-map' : 'source-map',
   // devtool: 'eval',
   proxy,
   nodeModulesTransform: { type: 'none', exclude: [] },

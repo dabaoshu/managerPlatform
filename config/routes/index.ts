@@ -77,7 +77,7 @@ const routes: MenuDataItem[] = [
           },
 
           {
-            name: '监控',
+            name: '总览',
             path: '/operation/overview',
             component: './operation/overview',
           },

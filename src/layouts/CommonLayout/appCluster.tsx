@@ -7,7 +7,7 @@ export default function AppCluster({ children }) {
   const [ready, setReady] = useState(false);
   // const getCluster = ClusterApi.getCluster;
   const [{ loadingEffects }, { setState, getCluster }] = useModel('clusterModel');
-  useAsyncEffect(async () => {
+  useAsyncEffect(async function () {
     const { data, isSuccess } = await getCluster();
     if (isSuccess) {
       const list = [];
