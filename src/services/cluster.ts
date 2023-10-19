@@ -14,6 +14,10 @@ export const ClusterApi = {
       ...payload
     }
   }),
+  getstatics: () => request<API.BaseRes>(`${url}/getstatics`, {
+    method: 'GET',
+  }),
+
   /**未使用 */
   getClusterByName(clusterName: string) {
     return request(`${url}/cluster/${clusterName}`, {

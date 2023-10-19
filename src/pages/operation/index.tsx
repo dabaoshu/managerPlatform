@@ -1,7 +1,7 @@
 import { useMount } from 'ahooks';
 import { Button, Divider, Dropdown, Popover, Space } from 'antd';
 import { getMenuData } from '@ant-design/pro-components';
-import { CsHeader } from '@/components/CsPage';
+import { CsContent, CsHeader } from '@/components/CsPage';
 import styles from './index.less';
 import { useModel } from 'umi';
 import { useState } from 'react';
@@ -124,7 +124,7 @@ export default function Operation(props) {
   return (
     <div className={styles.operation}>
       <CsHeader leftRender={<LeftRender />} extraRender={<ExtraRender />} />
-      <main>{props.children}</main>
+      <CsContent>{props.children}</CsContent>
     </div>
   );
 }
