@@ -3,12 +3,15 @@ import { useMount, useRequest, useSetState } from 'ahooks';
 import { Col, Row, Space, Divider, Spin, Table, Descriptions, DescriptionsProps } from 'antd';
 import { useMemo, type FC } from 'react';
 import styles from './index.less';
+import { CsContent, CsHeader, CsPage } from '@/components/CsPage';
+import { OperationLeftRender } from '../components/OperationLeftRender';
+import { OperationExtraRender } from '../components/OperationExtraRender';
 type Static = { total: number; run: number; stop: number };
 const InfoText: FC<{ item: Partial<Static>; count?: boolean }> = ({ item, count = true }) => {
   const { total = 0, run = 0, stop = 0 } = item;
   return (
     <div className={styles.infoText}>
-      <span className={styles.text}>{run}</span>
+      <span className={styles.text}>{total}</span>
       {count && (
         <div className={styles.count}>
           <Space size={8}>
@@ -22,8 +25,8 @@ const InfoText: FC<{ item: Partial<Static>; count?: boolean }> = ({ item, count 
           </Space>
           <Divider type="vertical" />
           <Space size={8}>
-            <span>总数</span>
-            <span>{total}</span>
+            <span>其他</span>
+            <span>{total - run - stop}</span>
           </Space>
         </div>
       )}
@@ -112,63 +115,66 @@ export default function Overview() {
         setData(res.data);
       }
     },
+    pollingInterval: 3000,
+    pollingWhenHidden: false,
   });
-  useMount(() => {
-    ClusterApi.getstatics();
-  });
+
   return (
-    <div className={styles.overview}>
-      <Spin spinning={loading}>
-        <Row gutter={[16, 16]}>
-          <Col span={8}>
-            <InfoCard title={'SERVER统计'}>
-              <InfoText item={data.serverStatics} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'RM统计'}>
-              <InfoText item={data.resourcemanagerStatics} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'TSO统计'}>
-              <InfoText item={data.tsoStatics} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'DAEMON统计'}>
-              <InfoText item={data.daemonStatics} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'写worker统计'}>
-              <InfoText item={data.workerWriterStatics} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'读worker统计'}>
-              <InfoText item={data.workerStatics} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'Fdb统计'}>
-              <InfoText item={data.fdbStatics} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'表数量'}>
-              <InfoText item={{ run: data.tableCount }} count={false} />
-            </InfoCard>
-          </Col>
-          <Col span={8}>
-            <InfoCard title={'数据库数量'}>
-              <InfoText item={{ run: data.dbCount }} count={false} />
-            </InfoCard>
-          </Col>
-        </Row>
-        {/* <ConnetCard data={data}></ConnetCard> */}
-        <BaseInfoCard data={data}></BaseInfoCard>
-      </Spin>
-    </div>
+    <CsPage>
+      <CsHeader leftRender={<OperationLeftRender />} extraRender={<OperationExtraRender />} />
+      <CsContent>
+        <div className={styles.overview}>
+          <Row gutter={[16, 16]}>
+            <Col span={8}>
+              <InfoCard title={'SERVER统计'}>
+                <InfoText item={data.serverStatics} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'RM统计'}>
+                <InfoText item={data.resourcemanagerStatics} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'TSO统计'}>
+                <InfoText item={data.tsoStatics} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'DAEMON统计'}>
+                <InfoText item={data.daemonStatics} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'写worker统计'}>
+                <InfoText item={data.workerWriterStatics} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'读worker统计'}>
+                <InfoText item={data.workerStatics} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'Fdb统计'}>
+                <InfoText item={data.fdbStatics} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'表数量'}>
+                <InfoText item={{ total: data.tableCount }} count={false} />
+              </InfoCard>
+            </Col>
+            <Col span={8}>
+              <InfoCard title={'数据库数量'}>
+                <InfoText item={{ total: data.dbCount }} count={false} />
+              </InfoCard>
+            </Col>
+          </Row>
+          {/* <ConnetCard data={data}></ConnetCard> */}
+          <BaseInfoCard data={data}></BaseInfoCard>
+        </div>
+      </CsContent>
+    </CsPage>
   );
 }

@@ -1,0 +1,74 @@
+.nodeTable {
+  margin-bottom: 24px;
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    -webkit-box-align: center;
+    -webkit-box-pack: justify;
+    .title {
+      color: rgb(32, 45, 64);
+      font-weight: 500;
+      font-size: 16px;
+    }
+  }
+  :global {
+    .ant-table-wrapper .ant-table .ant-table-tbody > tr.ant-table-expanded-row > td {
+      background-color: transparent;
+    }
+    .ant-table-wrapper .ant-table .ant-table-thead > tr > th,
+    .ant-table-wrapper .ant-table .ant-table-thead > tr > td {
+      padding: 10px 16px;
+      background-color: rgb(255, 255, 255);
+    }
+    .ant-table-wrapper .ant-table .ant-table-tbody > tr > td {
+      padding: 14px 16px;
+    }
+
+    .ant-table-wrapper .ant-table .ant-table-thead > tr > th::before,
+    .ant-table-wrapper .ant-table .ant-table-thead > tr > td::before {
+      visibility: hidden;
+    }
+    .ant-table-wrapper .ant-table .ant-table-tbody > tr {
+      position: relative;
+    }
+  }
+  :global(.ant-table-wrapper .ant-table .ant-table-tbody > tr) {
+    &:hover {
+      .actions {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        bottom: 0px;
+        display: block;
+      }
+    }
+  }
+}
+.actions {
+  display: none;
+  .actionsMask {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    -webkit-box-align: center;
+    &::before {
+      display: flex;
+      align-items: center;
+      height: 100%;
+      -webkit-box-align: center;
+    }
+    .actionIcon {
+      color: @primary-color;
+      font-size: 10px;
+    }
+  }
+}
+
+.expandedRowRender {
+  margin-bottom: 16px;
+  padding: 24px;
+  border: 0.5px solid rgb(223, 229, 240);
+  border-radius: 12px;
+}

@@ -1,9 +1,6 @@
 import {
   ProFormDependency,
-  ProFormItem,
-  ProFormList,
   ProFormRadio,
-  ProFormSelect,
   ProFormText,
   ProFormTextArea,
   StepsForm,
@@ -34,11 +31,11 @@ const nodeTypes = [
     key: 'daemonManagerNodes',
   },
   {
-    title: '读',
+    title: '读worker',
     key: 'workerNodes',
   },
   {
-    title: '写',
+    title: '写worker',
     key: 'workerWriteNodes',
   },
   {
@@ -111,7 +108,7 @@ const NodeFormList = ({ nodeType, title }) => {
   };
 
   return (
-    <Form.Item label={`${title} 节点`} className={styles.formlist}>
+    <Form.Item label={title} className={styles.formlist}>
       <Form.List name={nodeType} initialValue={[defaultValue]}>
         {(fields, { add, remove }, { errors }) => {
           return (
@@ -327,7 +324,13 @@ export default function NodeConfig() {
           }}
         </ProFormDependency>
         {nodeTypes.map((nodeType) => {
-          return <NodeFormList key={nodeType.key} nodeType={nodeType.key} title={nodeType.title} />;
+          return (
+            <NodeFormList
+              key={nodeType.key}
+              nodeType={nodeType.key}
+              title={`${nodeType.title} 节点`}
+            />
+          );
         })}
       </div>
     </StepsForm.StepForm>

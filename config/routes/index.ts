@@ -86,6 +86,11 @@ const routes: MenuDataItem[] = [
             path: '/operation/nodes',
             component: './operation/nodes',
           },
+          {
+            name: '参数设置',
+            path: '/operation/parameter',
+            component: './operation/parameter',
+          },
         ],
       },
       {

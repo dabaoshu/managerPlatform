@@ -1,0 +1,59 @@
+.LeftRender {
+  .backIcon {
+    font-size: 12px;
+  }
+  .title {
+    font-size: 20px;
+    cursor: pointer;
+  }
+}
+.tabs {
+  padding: 0 32px;
+
+  :global {
+    .ant-tabs-nav .ant-tabs-tab {
+      padding-top: 0px;
+      padding-bottom: 7px;
+    }
+    .ant-tabs-nav .ant-tabs-ink-bar {
+      height: 0;
+    }
+    .ant-tabs-nav {
+      margin: 0;
+    }
+  }
+  .tabExtra {
+    position: absolute;
+    right: 0;
+    bottom: 10px;
+  }
+}
+.parameterCsContent {
+  height: calc(100% - 29px - 76px);
+  padding: 0 32px 72px;
+  overflow: auto;
+  :global {
+    .ant-pro-card-body {
+      padding: 0;
+    }
+  }
+}
+
+.footer {
+  position: absolute;
+  right: 0px;
+  bottom: 0px;
+  left: 0px;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  background-color: rgb(255, 255, 255);
+  box-shadow: rgba(175, 193, 221, 0.26) 10px 0px 32px;
+  -webkit-box-align: center;
+  -webkit-box-pack: justify;
+}
+.modalHeader {
+  padding: 8px 0;
+}

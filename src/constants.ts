@@ -10,8 +10,7 @@ export const NET_CONF = {
 export const LOCAL_STORAGE = {
   TOKEN: 'Token',
   USERNAME: 'user', //用户token
-  USER_INFO: 'user-info', //当前用户信息 TODO:
-  CLUSTER_INFO: 'cluster-info', //当前集群信息
+  HIDDEN_MSG: "hidden-msg"
 };
 
 export const whiteApis = [

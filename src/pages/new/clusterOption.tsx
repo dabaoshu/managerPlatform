@@ -7,7 +7,7 @@ export default function ClusterOption() {
       <div>
         <div>数据库配置</div>
         <ProFormText.Password label="数据库root用户密码" name="rootpassWord" />
-        <ProFormText label={'安装路径'} name="path"></ProFormText>
+        <ProFormText label={'安装路径'} name="path" />
       </div>
     </StepsForm.StepForm>
   );

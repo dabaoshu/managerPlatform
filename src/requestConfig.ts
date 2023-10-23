@@ -1,9 +1,9 @@
 import { message, notification } from 'antd';
-import type { RequestConfig } from 'umi';
+import type { RequestConfig, } from 'umi';
+import { formatMessage, } from 'umi';
 import type { Context } from 'umi-request'
 import { LOCAL_STORAGE, whiteApis } from './constants';
 import loginServer from './module/login.server';
-const formatMessage = () => ""
 const httpCodeMsg = {
   200: '服务器成功返回请求的数据。',
   201: '新建或修改数据成功。',
@@ -145,6 +145,8 @@ export const hocResponse = <T>(
   const msgNewError =
     localErrorTips || resultMsg || formatMessage({ id: 'COMMON_FAILED', defaultMessage: '失败' });
   // 雷电
+  console.log("msgNewError", resultObject, resultMsg, resultCode, localErrorTips);
+
   const isSuccess = `${resultCode}` === '0000';
 
   if (isSuccess && isShowSuccessTips) message.success(msgNewSuccess);

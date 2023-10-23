@@ -7,6 +7,8 @@ export const ClusterApi = {
   getCluster: () => request<API.BaseRes>(`${url}/cluster`, {
     method: 'GET',
   }),
+
+
   /**new */
   checkhost: (payload) => request<API.BaseRes>(`/api/v1/deploy/checkhost`, {
     method: 'POST',
@@ -14,26 +16,44 @@ export const ClusterApi = {
       ...payload
     }
   }),
+  getClusterConfig: (clusterName: string) => {
+    return request<API.BaseRes>(`${url}/clusterconfig/${clusterName}`, {
+      method: 'GET',
+    });
+  },
+  saveClusterConfig: (clusterName: string, data) => {
+    return request<API.BaseRes>(`${url}/clusterconfig/${clusterName}`, {
+      method: 'PUT',
+      body: data,
+    });
+  },
+
+  /* 集群总览*/
   getstatics: () => request<API.BaseRes>(`${url}/getstatics`, {
     method: 'GET',
   }),
+  /* 节点管理*/
+  getinstances: () => request<API.BaseRes>(`${url}/getinstances`, {
+    method: 'GET',
+  }),
+  onlineClusterNode(payload: { clusterName?, ip?, role?}) {
+    return request(`${url}/node/start`, {
+      method: "PUT",
+      data: payload
+    });
+  },
+  offlineClusterNode(payload: { clusterName?, ip?, role?}) {
+    return request(`${url}/node/stop`, {
+      method: "PUT",
+      data: payload
+    });
+  },
 
   /**未使用 */
   getClusterByName(clusterName: string) {
     return request(`${url}/cluster/${clusterName}`, {
       method: 'GET', handleResp: true
       , data: {}
-    });
-  },
-  getClusterConfig(clusterName: string) {
-    return request(`${url}/config/${clusterName}`, {
-      method: 'GET',
-    });
-  },
-  saveClusterConfig(clusterName: string, data, force) {
-    return request(`${url}/config/${clusterName}?force=${force}`, {
-      method: 'post',
-      body: data,
     });
   },
   getClusterCreateFormSchema() {
@@ -84,12 +104,7 @@ export const ClusterApi = {
   deleteClusterNode(id, params, password?) {
     return request.delete(`${url}/node/${id}?password=${password || ''}`, { params });
   },
-  onlineClusterNode(clusterName, ip, password?) {
-    return request.put(`${url}/node/start/${clusterName}?ip=${ip}&password=${password || ''}`);
-  },
-  offlineClusterNode(clusterName, ip, password?) {
-    return request.put(`${url}/node/stop/${clusterName}?ip=${ip}&password=${password || ''}`);
-  },
+
   getNodeLog({ clusterName, ip, logType, lines = 1000, tail = true }) {
     return request.post(`${url}/node/log/${clusterName}?ip=${ip}`, {
       lines,

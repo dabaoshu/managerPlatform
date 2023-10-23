@@ -58,6 +58,8 @@ export default (props) => {
     },
     disableMobile: true,
     menuItemRender: (menuItemProps, defaultDom) => {
+      console.log(menuItemProps);
+
       if (menuItemProps.isUrl) {
         return defaultDom;
       }

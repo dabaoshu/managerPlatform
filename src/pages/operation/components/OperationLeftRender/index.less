@@ -1,0 +1,29 @@
+.title {
+  width: 100%;
+  font-weight: 500;
+  font-size: 20px;
+}
+.flexbox {
+  display: flex;
+  align-items: center;
+  .menuItem {
+    margin-left: 20px;
+    color: rgb(133, 146, 166);
+    font-weight: 400;
+    font-size: 20px;
+    cursor: pointer;
+    &.selected {
+      color: rgb(32, 45, 64);
+      font-weight: 500;
+    }
+    &:first-child {
+      margin: 0;
+    }
+  }
+}
+.split {
+  width: 1px;
+  height: 16px;
+  margin: 0px 20px;
+  background-color: rgb(223, 229, 240);
+}
