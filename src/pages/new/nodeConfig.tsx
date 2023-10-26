@@ -2,17 +2,17 @@ import {
   ProFormDependency,
   ProFormRadio,
   ProFormText,
-  ProFormTextArea,
   StepsForm,
 } from '@ant-design/pro-components';
 import styles from './index.less';
 import { Row, Col, Form, Badge, message, Tooltip, Space, Button } from 'antd';
 import { ReloadOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
-import { ModalForm } from '@ant-design/pro-components';
 import _ from 'lodash';
 import { useRequest } from 'ahooks';
 import { ClusterApi } from '@/services/cluster';
+import { ipPattern } from '@/utils/regex';
+import { BatchIpCreateModal } from './batchIpCreateModal';
 const nodeTypes = [
   {
     title: 'server',
@@ -45,9 +45,6 @@ const nodeTypes = [
 ];
 // server/tso/resourcemanager/daemon/worker/worker-write/fdb
 
-const ipPattern =
-  /^((\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])\.){3}(\d|[1-9]\d|1\d\d|2[0-4]\d|25[0-5])(?::(?:[0-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?$/;
-
 const statusMap = {
   '0': { text: '节点状态正常', status: 'success' },
   '1': { text: '节点连接超时', status: 'error' },
@@ -58,19 +55,17 @@ const statusMap = {
 };
 const defaultValue = { ip: '', status: 'default' };
 
-const NodeStatus = ({ value }: { value?: string }) => {
-  const { status, text } = statusMap[value];
-  return <Badge status={status} text={text} />;
-};
-const NodeErrText = ({ value }: { value?: string }) => {
+const NodeStatus = ({ value }: { value?: { status: string; errText: string } }) => {
+  const { status, text } = statusMap[value.status];
   return (
-    <>
-      {value && (
-        <Tooltip title={value}>
+    <Space className={styles.nodeStatusBox} size={8}>
+      <Badge status={status} text={text} />
+      {value.errText && (
+        <Tooltip title={value.errText}>
           <FileTextOutlined />
         </Tooltip>
       )}
-    </>
+    </Space>
   );
 };
 
@@ -101,16 +96,15 @@ const NodeFormList = ({ nodeType, title }) => {
     form.setFieldsValue({
       [nodeType]: hosts.map((o) => ({ ...o, errText: '666' })),
     });
-    // checkhostFecth({ host, password, user, savePassword, usePubkey }).then((res) => {
-    //   console.log(res);
-
-    // });
+    checkhostFecth({ host, password, user, savePassword, usePubkey }).then((res) => {
+      console.log(res);
+    });
   };
 
   return (
     <Form.Item label={title} className={styles.formlist}>
       <Form.List name={nodeType} initialValue={[defaultValue]}>
-        {(fields, { add, remove }, { errors }) => {
+        {(fields, { add, remove }) => {
           return (
             <>
               <Row className={classnames(styles.formlistheader, styles.row)} gutter={[16, 8]}>
@@ -129,8 +123,6 @@ const NodeFormList = ({ nodeType, title }) => {
                 <Col span={2}>操作</Col>
               </Row>
               {fields.map(({ key, name, ...restField }) => {
-                console.log(fields);
-
                 return (
                   <Row key={key} className={classnames(styles.row)} gutter={[16, 8]}>
                     <Col span={9}>
@@ -152,22 +144,18 @@ const NodeFormList = ({ nodeType, title }) => {
                     </Col>
                     <Col span={8} />
                     <Col span={5}>
-                      <Space className={styles.nodeStatusBox} size={8}>
-                        <Form.Item name={[name, 'status']}>
-                          <NodeStatus />
-                        </Form.Item>
-                        <Form.Item name={[name, 'errText']}>
-                          <NodeErrText />
-                        </Form.Item>
-                      </Space>
+                      <Form.Item name={[name]}>
+                        <NodeStatus />
+                      </Form.Item>
                     </Col>
                     <Col span={2}>
                       <Button
                         disabled={fields.length === 1}
+                        loading={loading}
                         icon={
                           <DeleteOutlined onClick={() => remove(key)} className="cursor-pointer" />
                         }
-                      ></Button>
+                      />
                     </Col>
                   </Row>
                 );
@@ -177,68 +165,21 @@ const NodeFormList = ({ nodeType, title }) => {
                   <span className="cursor-pointer" onClick={() => add(defaultValue)}>
                     + 节点
                   </span>
-                  <ModalForm
-                    width={450}
+                  <BatchIpCreateModal
                     title={`批量添加 ${nodeType} 节点`}
                     trigger={<span className="cursor-pointer">批量添加</span>}
-                    // form={form}
-                    autoFocusFirstInput
-                    modalProps={{
-                      destroyOnClose: true,
-                      bodyStyle: {
-                        padding: 0,
-                        margin: '20px 0',
-                      },
-                      onCancel: () => console.log('run'),
-                    }}
-                    onFinish={async ({ ips }) => {
+                    onFinish={(ips) => {
+                      console.log(ips);
+
                       const field = form.getFieldValue(nodeType);
-                      const ipList = ips.split('\n').map((ip) => ({
+                      const ipList = ips.map((ip) => ({
                         ip,
                         status: 'default',
                       }));
                       form.setFieldValue(nodeType, [...field, ...ipList]);
-                      return true;
                     }}
-                  >
-                    <ProFormTextArea
-                      name={'ips'}
-                      fieldProps={{
-                        rows: 5,
-                      }}
-                      placeholder={`请输入 IP，多个 IP 之间换行分割。
-示例：
-142.123.45.23
-143.23.12.32
-143.23.11.33`}
-                      validateTrigger={[]}
-                      rules={[
-                        {
-                          // pattern: ipPattern,
-                          // message: 'IP 地址格式不正确',
-                          required: true,
-                          validator: async (rule, value: string) => {
-                            try {
-                              const ipList = value.split('\n');
-                              const next = ipList.every((ip) => ipPattern.test(ip));
-                              if (!next) return Promise.reject('IP 地址格式不正确');
-                              const field = form.getFieldValue(nodeType);
-                              const repeat = field.some(({ ip }) => ipList.includes(ip));
-                              if (repeat) return Promise.reject('节点 IP 重复');
-                              const newIplist = _.uniq(ipList);
-
-                              if (newIplist.length > 0 && newIplist.length !== ipList.length) {
-                                return Promise.reject('新增的节点IP重复');
-                              }
-                            } catch (error) {
-                              return Promise.reject('IP 地址格式不正确');
-                            }
-                            return Promise.resolve();
-                          },
-                        },
-                      ]}
-                    />
-                  </ModalForm>
+                    list={form.getFieldValue(nodeType)}
+                  />
                 </Space>
               </Form.Item>
             </>

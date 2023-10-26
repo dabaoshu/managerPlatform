@@ -57,6 +57,8 @@
     "lodash-decorators": "^6.0.0",
     "mitt": "^3.0.0",
     "moment": "^2.29.0",
+    "monaco-editor": "^0.44.0",
+    "monaco-editor-webpack-plugin": "^7.1.0",
     "node-jsencrypt": "^1.0.0",
     "numeral": "^2.0.6",
     "nzh": "^1.0.3",
@@ -65,6 +67,7 @@
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "react-iframe": "^1.8.5",
+    "react-monaco-editor": "^0.54.0",
     "react-router": "^4.3.1",
     "umi": "^3.5.41"
   },

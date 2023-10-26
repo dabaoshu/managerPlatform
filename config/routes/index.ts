@@ -91,16 +91,40 @@ const routes: MenuDataItem[] = [
             path: '/operation/parameter',
             component: './operation/parameter',
           },
+          {
+            path: '/operation/scaling',
+            routes: [
+              {
+                name: '扩容/缩容',
+                path: '/operation/scaling/:type/:nodeType',
+                component: './operation/scaling',
+              },
+              { path: '/*', component: './404', }
+            ]
+          },
         ],
       },
       {
-        name: '集群2',
-        icon: 'setting',
-        path: '/operation2',
-        component: './operation',
+        name: '监控',
+        icon: 'FundProjectionScreenOutlined',
+        path: '/monitor',
+        component: './monitor',
         hideChildrenInMenu: true,
         routes: [
-
+          {
+            path: '/monitor',
+            redirect: './dashboard',
+          },
+          {
+            name: '监控',
+            path: '/monitor/dashboard',
+            component: './monitor/dashboard',
+          },
+          {
+            name: '告警',
+            path: '/monitor/alarm',
+            component: './monitor/alarm',
+          },
         ],
       },
       { path: '/*', component: './404', }

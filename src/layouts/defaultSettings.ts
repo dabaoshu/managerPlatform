@@ -55,7 +55,7 @@ const layoutSettings: LocalLayoutSettings = {
   layout: 'side',
   contentWidth: 'Fluid',
   fixedHeader: false,
-  fixSiderbar: true,
+  fixSiderbar: false,
   colorWeak: false,
   pwa: false,
   collapsed: false,

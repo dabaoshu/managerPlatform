@@ -1,24 +1,17 @@
+import { useModel } from 'umi';
 import styles from './index.less';
 
 export default function Operation(props) {
-  // const [menuList, setMenuList] = useState([]);
-  // useMount(() => {
-  //   const MenuData = getMenuData([props.route]);
-  //   const { breadcrumbMap } = MenuData;
-  //   const list = [];
-  //   for (const [key, val] of breadcrumbMap) {
-  //     if (key !== selfUrl) {
-  //       list.push(val);
-  //     }
-  //   }
-  //   setMenuList(list);
-  // });
+  const [{ hiddenMsg, hiddenMsgOpen }] = useModel('clusterRestart');
 
   return (
     <section className={styles.operation}>
-      {/* <div className={styles.notice}>
-        <Notice />
-      </div> */}
+      {hiddenMsgOpen && (
+        <div className={styles.notice}>
+          {/* <Notice /> */}
+          提示
+        </div>
+      )}
       <div className={styles.operationMain}>{props.children}</div>
     </section>
   );

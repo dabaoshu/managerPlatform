@@ -1,4 +1,5 @@
 import { defineConfig } from 'umi';
+import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 import getProxy from './proxy';
 import routes from './routes';
 import theme from './theme';
@@ -78,27 +79,31 @@ export default defineConfig({
   // chainWebpack: webpackPlugin,
   // extraBabelPlugins: ['babel-plugin-react-require'],
   // chunks: ['vendors', 'umi'],
-  // chainWebpack: function (config, { webpack }) {
-  //   config.merge({
-  //     optimization: {
-  //       splitChunks: {
-  //         chunks: 'all',
-  //         minSize: 30000,
-  //         minChunks: 3,
-  //         automaticNameDelimiter: '.',
-  //         cacheGroups: {
-  //           vendor: {
-  //             name: 'vendors',
-  //             test({ resource }) {
-  //               return /[\\/]node_modules[\\/]/.test(resource);
-  //             },
-  //             priority: 10,
-  //           },
-  //         },
-  //       },
-  //     },
-  //   });
-  // },
+  chainWebpack: function (config, { webpack }) {
+    config.merge({
+      optimization: {
+        splitChunks: {
+          chunks: 'all',
+          minSize: 30000,
+          minChunks: 3,
+          automaticNameDelimiter: '.',
+          cacheGroups: {
+            vendor: {
+              name: 'vendors',
+              test({ resource }) {
+                return /[\\/]node_modules[\\/]/.test(resource);
+              },
+              priority: 10,
+            },
+          },
+        },
+      },
+    });
+    config.plugin('monaco-editor-webpack-plugin').use(MonacoWebpackPlugin, [
+      // 按需配置
+      { languages: [] }
+    ]);
+  },
   // qiankun: {
   //   master: {
   //     apps: [

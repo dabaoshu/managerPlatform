@@ -1,23 +1,23 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import styles from './index.less';
-import { Table, Descriptions, Space } from 'antd';
+import { Table, Descriptions, Space, Popconfirm } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
-import { LeftOutlined, RightOutlined } from '@ant-design/icons';
+import { LeftOutlined, RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
-import { useRequest } from 'ahooks';
-import { ClusterApi } from '@/services/cluster';
 import { useModel } from 'umi';
+import { useSetState } from 'ahooks';
+import { TriggerModal } from '@/components/triggerModal';
+import LogModal from './logModal';
 
-interface DataType {
-  key: React.Key;
-  name: string;
-  age: number;
-  address: string;
-  description: string;
+interface Irecord {
+  ip: string;
+  cpu: string;
+  disk: string;
+  memory: string;
 }
 
 const ExpandAction = ({ children }) => {
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   return (
     <div className={styles.actionsMask}>
       <Space size={16}>
@@ -33,23 +33,30 @@ const ExpandAction = ({ children }) => {
   );
 };
 
-export default function NodeTable({ title, data, nodeType }) {
+export default function NodeTable({ title, data = [], nodeType }) {
   const [{ currentCluster }] = useModel('clusterModel');
-  const { loading: loading1, runAsync: offlineClusterNode } = useRequest(
-    ClusterApi.offlineClusterNode,
-    {
-      manual: true,
-    },
-  );
-  const { loading: loading2, runAsync: onlineClusterNode } = useRequest(
-    ClusterApi.onlineClusterNode,
-    {
-      manual: true,
-    },
-  );
-  const tableLoading = loading1 || loading2;
+  const [{ loadingEffects }, { offlineClusterNode, onlineClusterNode }] =
+    useModel('clusterRestart');
+  const tableLoading = loadingEffects.offlineClusterNode || loadingEffects.onlineClusterNode;
 
-  const columns: ColumnsType<DataType> = [
+  const handleActionClick = (type, record?: Irecord) => {
+    switch (type) {
+      case 'start':
+      case 'reStart':
+        onlineClusterNode({ clusterName: currentCluster.cluster, role: nodeType, ip: record?.ip });
+        break;
+      case 'stop':
+        onlineClusterNode({ clusterName: currentCluster.cluster, role: nodeType, ip: record?.ip });
+        break;
+      case 'viewLog':
+        break;
+
+      default:
+        break;
+    }
+  };
+
+  const columns: ColumnsType<Irecord> = [
     { title: 'IP', dataIndex: 'ip', key: 'ip' },
     { title: '角色', dataIndex: 'hostname', key: 'hostname' },
     { title: '状态', dataIndex: 'status', key: 'status' },
@@ -65,10 +72,33 @@ export default function NodeTable({ title, data, nodeType }) {
       key: 'x',
       render: (v, r) => (
         <ExpandAction>
-          <a>启动</a>
-          <a>停止</a>
-          <a>重启</a>
-          <a>查看日志</a>
+          <Popconfirm
+            title={`确认启动${title} ${r.ip}`}
+            onConfirm={() => handleActionClick('start', r)}
+            // icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+          >
+            <a>启动</a>
+          </Popconfirm>
+          <Popconfirm
+            title={`确认停止${title} ${r.ip}`}
+            onConfirm={() => handleActionClick('stop', r)}
+            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+          >
+            <a>停止</a>
+          </Popconfirm>
+          <Popconfirm
+            title={`确认重启${title} ${r.ip}`}
+            onConfirm={() => handleActionClick('reStart', r)}
+            icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+          >
+            <a>重启</a>
+          </Popconfirm>
+          <LogModal
+            title={`${title} ${r.ip}日志`}
+            trigger={<a>查看日志</a>}
+            role={nodeType}
+            ip={r.ip}
+          />
         </ExpandAction>
       ),
     },
@@ -77,24 +107,24 @@ export default function NodeTable({ title, data, nodeType }) {
     <section className={styles.nodeTable}>
       <div className={styles.header}>
         <div className={styles.title}>{title}</div>
-        {/* <div>
+        <div>
           <Space size={16}>
-            <a
-              onClick={() =>
-                onlineClusterNode({ clusterName: currentCluster.cluster, role: nodeType })
-              }
+            <Popconfirm
+              title={`确认停止${title}`}
+              onConfirm={() => handleActionClick('stop-node')}
+              icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
             >
-              重启
-            </a>
-            <a
-              onClick={() =>
-                offlineClusterNode({ clusterName: currentCluster.cluster, role: nodeType })
-              }
+              <a>重启</a>
+            </Popconfirm>
+            <Popconfirm
+              title={`确认停止${title}`}
+              onConfirm={() => handleActionClick('restart-node')}
+              icon={<QuestionCircleOutlined style={{ color: 'blue' }} />}
             >
-              停止
-            </a>
+              <a> 停止</a>
+            </Popconfirm>
           </Space>
-        </div> */}
+        </div>
       </div>
       <div>
         <Table

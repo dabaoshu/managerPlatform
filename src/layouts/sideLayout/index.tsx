@@ -35,17 +35,13 @@ export default (props) => {
   };
 
   const _props: ProLayoutProps = {
-    // locale: true,
     siderWidth: 208,
     collapsed: layoutSettings.collapsed,
     onCollapse,
-    // loading: true,
-    // disableContentMargin: false,
     rightContentRender: false,
     waterMarkProps: {
       content: initialState?.currentUser?.userName,
     },
-    // footerRender: () => <Footer />,
     collapsedButtonRender: (collapsed, dom) => {
       return <CollapsedButton collapsed={collapsed} onCollapse={onCollapse} />;
     },
@@ -58,12 +54,10 @@ export default (props) => {
     },
     disableMobile: true,
     menuItemRender: (menuItemProps, defaultDom) => {
-      console.log(menuItemProps);
-
       if (menuItemProps.isUrl) {
         return defaultDom;
       }
-      if (menuItemProps.path && location.pathname !== menuItemProps.path) {
+      if (menuItemProps.path && location.pathname.indexOf(menuItemProps.path) !== 0) {
         return (
           <Link to={menuItemProps.path} target={menuItemProps.target}>
             {defaultDom}
@@ -72,7 +66,6 @@ export default (props) => {
       }
       return defaultDom;
     },
-    // ...defaultSettings,
     ...layoutSettings,
   };
 
@@ -86,11 +79,7 @@ export default (props) => {
   return (
     <div className={styles.sideRoot}>
       <ProLayout {..._props} route={props.route}>
-        <WithExceptionOpChildren
-          // noFound={userConfig?.noFound}
-          // unAccessible={userConfig?.unAccessible}
-          currentPathConfig={currentPathConfig}
-        >
+        <WithExceptionOpChildren currentPathConfig={currentPathConfig}>
           <div className={styles.right}>{children}</div>
         </WithExceptionOpChildren>
       </ProLayout>

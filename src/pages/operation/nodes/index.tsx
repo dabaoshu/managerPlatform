@@ -29,33 +29,25 @@ export default function Nodes() {
       <CsHeader leftRender={<OperationLeftRender />} extraRender={<OperationExtraRender />} />
       <CsContent>
         <div>
-          <NodeTable
-            title={'server节点'}
-            nodeType={'serverNodes'}
-            data={state.serverEntity.nodes}
-          />
-          <NodeTable title={'tso节点'} nodeType={'tsoNodes'} data={state.tsoEntity.nodes} />
+          <NodeTable title={'server节点'} nodeType={'server'} data={state.serverEntity.nodes} />
+          <NodeTable title={'tso节点'} nodeType={'tso'} data={state.tsoEntity.nodes} />
           <NodeTable
             title={'Resourcemanager节点'}
-            nodeType={'resourceManagerNodes'}
+            nodeType={'resourcemanager'}
             data={state.resourceManagerEntity.nodes}
           />
           <NodeTable
             title={'Daemonmanager节点'}
-            nodeType={'daemonManagerNodes'}
+            nodeType={'daemon'}
             data={state.daemonEntity.nodes}
           />
-          <NodeTable
-            title={'读worker节点'}
-            nodeType={'workerNodes'}
-            data={state.workerEntity.nodes}
-          />
+          <NodeTable title={'读worker节点'} nodeType={'worker'} data={state.workerEntity.nodes} />
           <NodeTable
             title={'写worker节点'}
-            nodeType={'workerWriteNodes'}
+            nodeType={'worker-write'}
             data={state.workerWriterEntity.nodes}
           />
-          <NodeTable title={'Fdb元数据节点'} nodeType={'fdbNodes'} data={state.fdbEntity.nodes} />
+          <NodeTable title={'fdb'} nodeType={'fdb'} data={state.fdbEntity.nodes} />
         </div>
       </CsContent>
     </CsPage>

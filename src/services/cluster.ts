@@ -37,16 +37,33 @@ export const ClusterApi = {
     method: 'GET',
   }),
   onlineClusterNode(payload: { clusterName?, ip?, role?}) {
-    return request(`${url}/node/start`, {
+    return request<API.BaseRes>(`${url}/node/start`, {
       method: "PUT",
       data: payload
     });
   },
   offlineClusterNode(payload: { clusterName?, ip?, role?}) {
-    return request(`${url}/node/stop`, {
+    return request<API.BaseRes>(`${url}/node/stop`, {
       method: "PUT",
       data: payload
     });
+  },
+
+  getNodeLog: ({ clusterName, ip, logType, lines = 1000, tail = true }) => {
+    return request<API.BaseRes>(`${url}/node/log/${clusterName}?ip=${ip}`, {
+      method: "POST",
+      data: {
+        lines,
+        logType,
+        tail,
+      }
+    });
+  },
+  // 获取节点列表的
+  getClusterInfo: (id) => {
+    return request<API.BaseRes>(`${url}/get/${id}`, {
+      method: "get"
+    })
   },
 
   /**未使用 */
@@ -95,9 +112,7 @@ export const ClusterApi = {
       params,
     );
   },
-  getClusterInfo(id) {
-    return request.get(`${url}/get/${id}`);
-  },
+
   addClusterNode(id, params, force, password?) {
     return request.post(`${url}/node/${id}?password=${password || ''}&force=${force}`, params);
   },
@@ -105,11 +120,5 @@ export const ClusterApi = {
     return request.delete(`${url}/node/${id}?password=${password || ''}`, { params });
   },
 
-  getNodeLog({ clusterName, ip, logType, lines = 1000, tail = true }) {
-    return request.post(`${url}/node/log/${clusterName}?ip=${ip}`, {
-      lines,
-      logType,
-      tail,
-    });
-  },
+
 };
