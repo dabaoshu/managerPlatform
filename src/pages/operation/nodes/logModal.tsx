@@ -11,7 +11,7 @@ export default function LogModal({ trigger, ip, role, title }) {
   const [formRef] = Form.useForm();
   const [{ currentCluster }] = useModel('clusterModel');
   const [{ logValue }, setState] = useSetState({
-    logValue: '',
+    logValue: ``,
   });
   const { loading, runAsync } = useRequest(ClusterApi.getNodeLog, {
     manual: true,

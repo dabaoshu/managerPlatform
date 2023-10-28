@@ -1,4 +1,4 @@
-import type { RunTimeLayoutConfig } from 'umi';
+// import type { RunTimeLayoutConfig } from 'umi';
 // import RightContent from '@/layouts/RightContent';
 import { requestConfig } from './requestConfig';
 import loginServer from './module/login.server';

@@ -3,7 +3,7 @@ import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 import getProxy from './proxy';
 import routes from './routes';
 import theme from './theme';
-
+import metadata from 'monaco-editor/esm/metadata';
 const { NODE_ENV, BASE = '/', PUBLIC_PATH = '/' } = process.env;
 
 const ROUTER_BASE = BASE.lastIndexOf('/') === BASE.length - 1 ? BASE : `${BASE}/`;
@@ -57,14 +57,13 @@ export default defineConfig({
   // lessLoaderOptions: {
   //   javascriptEnabled: true,
   // },
-  // devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
-  devtool: NODE_ENV === 'production' ? 'source-map' : 'source-map',
+  devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
+  // devtool: NODE_ENV === 'production' ? 'source-map' : 'source-map',
   // devtool: 'eval',
   proxy,
   nodeModulesTransform: { type: 'none', exclude: [] },
   esbuild: {},
-  fastRefresh: {},
-  mfsu: {}, // 暂时屏蔽这个功能
+  // fastRefresh: {},
   webpack5: {},
   exportStatic: {},
   manifest: {
@@ -78,30 +77,57 @@ export default defineConfig({
   },
   // chainWebpack: webpackPlugin,
   // extraBabelPlugins: ['babel-plugin-react-require'],
-  // chunks: ['vendors', 'umi'],
-  chainWebpack: function (config, { webpack }) {
-    config.merge({
-      optimization: {
-        splitChunks: {
-          chunks: 'all',
-          minSize: 30000,
-          minChunks: 3,
-          automaticNameDelimiter: '.',
-          cacheGroups: {
-            vendor: {
-              name: 'vendors',
-              test({ resource }) {
-                return /[\\/]node_modules[\\/]/.test(resource);
+  chunks: NODE_ENV !== 'development' ? ["react", "antdesigns", "lodash", 'umi', 'vendors'] : ["umi"],
+  mfsu: {
+
+  }, // 暂时屏蔽这个功能
+
+  chainWebpack: function (config, { webpack, env }) {
+    if (env !== 'development') {
+      config.merge({
+        optimization: {
+          minimize: true,
+          splitChunks: {
+            chunks: 'all',
+            minSize: 30000,
+            minChunks: 3,
+            automaticNameDelimiter: '.',
+            cacheGroups: {
+              react: {
+                name: 'react',
+                priority: 20,
+                test: /[\\/]node_modules[\\/](react|react-dom|react-dom-router)[\\/]/,
               },
-              priority: 10,
+              antdesigns: {
+                name: 'antdesigns',
+                chunks: 'all',
+                test: /[\\/]node_modules[\\/](antd|@ant-design|antd-mobile)/,
+                priority: 10,
+                enforce: true,
+              },
+              lodash: {
+                name: 'lodash',
+                test: /[\\/]node_modules[\\/]lodash[\\/]/,
+                priority: -2,
+                enforce: true,
+              },
+              vendors: {
+                name: 'vendors',
+                test({ resource }: any) {
+                  return /[\\/]node_modules[\\/]/.test(resource)
+                },
+                priority: -11,
+                enforce: true,
+              },
+
             },
           },
         },
-      },
-    });
+      });
+    }
     config.plugin('monaco-editor-webpack-plugin').use(MonacoWebpackPlugin, [
       // 按需配置
-      { languages: [] }
+      { languages: ["sql", "json"] }
     ]);
   },
   // qiankun: {

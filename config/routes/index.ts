@@ -127,6 +127,13 @@ const routes: MenuDataItem[] = [
           },
         ],
       },
+      {
+        name: '表管理 ',
+        icon: 'FundProjectionScreenOutlined',
+        path: '/tableMgr',
+        component: './tableMgr',
+        hideChildrenInMenu: true,
+      },
       { path: '/*', component: './404', }
     ],
   },
