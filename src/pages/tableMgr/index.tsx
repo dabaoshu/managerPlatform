@@ -94,19 +94,11 @@ export default function TableMgr() {
       width: 300,
       fixed: 'right',
       render: (text, record, _, action) => [
-        <a
-          key="view"
-          onClick={() => {
-            action?.startEditable?.(record.id);
-          }}
-        >
-          查看建表语句
-        </a>,
-        <LogModal trigger={<div>111</div>} ip="" title={''} role={''} key={'68'} />,
-        <a href={record.url} target="_blank" rel="noopener noreferrer" key="view">
+        <LogModal trigger={<a>查看建表语句</a>} ip="" title={''} role={''} key="view" />,
+        <a key="reserved" onClick={() => {}}>
           备份
         </a>,
-        <a href={record.url} target="_blank" rel="noopener noreferrer" key="666">
+        <a key="delete" onClick={() => {}}>
           删除
         </a>,
       ],
@@ -114,7 +106,7 @@ export default function TableMgr() {
   ];
   return (
     <CsPage>
-      <CsHeader leftRender="表指标"></CsHeader>
+      <CsHeader leftRender="表指标" />
       <CsContent>
         <div className={styles.section}>
           <ProTable
@@ -134,9 +126,6 @@ export default function TableMgr() {
             columnsState={{
               persistenceKey: 'tableMgr-columnsState',
               persistenceType: 'localStorage',
-              onChange(value) {
-                console.log('value: ', value);
-              },
             }}
             toolbar={{
               search: <Input />,

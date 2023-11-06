@@ -1,0 +1,89 @@
+.TimeRange {
+  .label {
+    display: inline-flex;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 130px;
+    height: 34px;
+    padding: 0px 8px;
+    font-size: 14px;
+    line-height: 34px;
+    background-color: rgb(255, 255, 255);
+    border: 1px solid rgb(204, 212, 226);
+    border-radius: 6px;
+    -webkit-box-align: center;
+    -webkit-box-pack: justify;
+  }
+}
+.TimeRangePopover {
+  display: flex;
+  justify-content: space-between;
+  height: 260px;
+  margin: -16px;
+  -webkit-box-pack: justify;
+  .rangeSelect {
+    width: 245px;
+    padding: 16px;
+    color: rgb(32, 45, 64);
+  }
+  .fasterSelect {
+    position: relative;
+    flex: 1 1 0%;
+    height: 100%;
+    padding: 16px 8px;
+    overflow: auto;
+    color: rgb(32, 45, 64);
+    border-left: 1px solid rgb(223, 229, 240);
+    .fasterSelectItem {
+      height: 34px;
+      padding: 0px 16px;
+      font-size: 14px;
+      line-height: 34px;
+      white-space: nowrap;
+      cursor: pointer;
+      &:hover {
+        color: rgb(0, 101, 253);
+        background-color: rgb(229, 240, 255);
+        border-radius: 6px;
+      }
+      &.selected {
+        color: rgb(0, 101, 253);
+      }
+    }
+  }
+}
+.timePick {
+  margin-bottom: 16px;
+  .PickLabel {
+    margin-bottom: 4px;
+    font-size: 12px;
+  }
+  .PickInput {
+    position: relative;
+    .PickInputLabel {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      width: 100%;
+      height: 34px;
+      padding: 0px 11px;
+      font-size: 14px;
+      border: 1px solid rgb(204, 212, 226);
+      border-radius: 6px;
+      -webkit-box-align: center;
+      -webkit-box-pack: justify;
+      .PickInputLabelText {
+      }
+      .PickInputLabelIcon {
+      }
+    }
+    .realPick {
+      position: absolute;
+      top: 0px;
+      right: 0px;
+      left: 0px;
+      cursor: pointer;
+      opacity: 0;
+    }
+  }
+}

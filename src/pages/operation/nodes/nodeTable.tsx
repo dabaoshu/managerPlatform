@@ -43,10 +43,18 @@ export default function NodeTable({ title, data = [], nodeType }) {
     switch (type) {
       case 'start':
       case 'reStart':
-        onlineClusterNode({ clusterName: currentCluster.cluster, role: nodeType, ip: record?.ip });
+        onlineClusterNode({
+          clusterName: currentCluster.clusterName,
+          role: nodeType,
+          ip: record?.ip,
+        });
         break;
       case 'stop':
-        onlineClusterNode({ clusterName: currentCluster.cluster, role: nodeType, ip: record?.ip });
+        onlineClusterNode({
+          clusterName: currentCluster.clusterName,
+          role: nodeType,
+          ip: record?.ip,
+        });
         break;
       case 'viewLog':
         break;

@@ -28,7 +28,7 @@ export const MonitorLeftRender = () => {
             <div
               key={menu.path}
               className={classnames(styles.menuItem, {
-                [styles.selected]: location.pathname === menu.path,
+                [styles.selected]: location.pathname.includes(menu.path),
               })}
               onClick={() => routePush(menu.path)}
             >

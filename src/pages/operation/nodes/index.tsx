@@ -5,7 +5,9 @@ import { ClusterApi } from '@/services/cluster';
 import { CsContent, CsHeader, CsPage } from '@/components/CsPage';
 import { OperationLeftRender } from '../components/OperationLeftRender';
 import { OperationExtraRender } from '../components/OperationExtraRender';
+import { useModel } from 'umi';
 export default function Nodes() {
+  const [{ currentCluster }] = useModel('clusterModel');
   const [state, setState] = useSetState({
     serverEntity: { nodes: [] },
     resourceManagerEntity: { nodes: [] },
@@ -18,6 +20,7 @@ export default function Nodes() {
   const { loading } = useRequest(ClusterApi.getinstances, {
     pollingInterval: 3000,
     pollingWhenHidden: false,
+    defaultParams: [currentCluster.clusterName],
     onSuccess: (res) => {
       if (res.isSuccess && res.data) {
         setState(res.data);

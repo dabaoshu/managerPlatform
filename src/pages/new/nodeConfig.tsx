@@ -1,5 +1,7 @@
 import {
+  ProFormCheckbox,
   ProFormDependency,
+  ProFormDigit,
   ProFormRadio,
   ProFormText,
   StepsForm,
@@ -13,46 +15,11 @@ import { useRequest } from 'ahooks';
 import { ClusterApi } from '@/services/cluster';
 import { ipPattern } from '@/utils/regex';
 import { BatchIpCreateModal } from './batchIpCreateModal';
-const nodeTypes = [
-  {
-    title: 'server',
-    key: 'serverNodes',
-  },
-  {
-    title: 'tso',
-    key: 'tsoNodes',
-  },
-  {
-    title: 'Resourcemanager',
-    key: 'resourceManagerNodes',
-  },
-  {
-    title: 'Daemonmanager',
-    key: 'daemonManagerNodes',
-  },
-  {
-    title: '读worker',
-    key: 'workerNodes',
-  },
-  {
-    title: '写worker',
-    key: 'workerWriteNodes',
-  },
-  {
-    title: 'Fdb元数据',
-    key: 'fdbNodes',
-  },
-];
-// server/tso/resourcemanager/daemon/worker/worker-write/fdb
+import LoadingIcon from '@/components/loadingIcon';
+import { nodeTypes, statusMap } from './utils';
+import { requiredRule } from '@/utils/form';
+import { useRef } from 'react';
 
-const statusMap = {
-  '0': { text: '节点状态正常', status: 'success' },
-  '1': { text: '节点连接超时', status: 'error' },
-  '2': { text: '密码错误', status: 'error' },
-  '3': { text: '服务拒绝连接', status: 'error' },
-  default: { text: '待检测', status: 'default' },
-  loading: { text: '检查中', status: 'processing' },
-};
 const defaultValue = { ip: '', status: 'default' };
 
 const NodeStatus = ({ value }: { value?: { status: string; errText: string } }) => {
@@ -71,22 +38,22 @@ const NodeStatus = ({ value }: { value?: { status: string; errText: string } }) 
 
 const getWayType = (nodeVisitorWay) => {
   return {
-    savePassword: nodeVisitorWay === 'user',
+    userPassword: nodeVisitorWay === 'user',
     usePubkey: nodeVisitorWay === 'ssh',
   };
 };
 
 const NodeFormList = ({ nodeType, title }) => {
   const form = Form.useFormInstance();
-  const { runAsync: checkhostFecth, loading } = useRequest(ClusterApi.checkhost, {
+  const { runAsync: checkhostFecth, loading: checkLoading } = useRequest(ClusterApi.checkhost, {
     manual: true,
   });
 
   const checkhost = (hosts) => {
-    const { password, user, nodeVisitorWay, sshPort } = form.getFieldsValue();
-    const { savePassword, usePubkey } = getWayType(nodeVisitorWay);
+    const { password, user, nodeVisitorWay, sshPort, savePassword } = form.getFieldsValue();
+    const { userPassword, usePubkey } = getWayType(nodeVisitorWay);
     if (!(user && password && sshPort)) {
-      if (savePassword) message.error('请输入访问节点用户名，节点密码和 SSH 端口');
+      if (userPassword) message.error('请输入访问节点用户名，节点密码和 SSH 端口');
       if (usePubkey) message.error('请输入访问节点用户名，节点私钥和 SSH 端口');
       return;
     }
@@ -94,15 +61,28 @@ const NodeFormList = ({ nodeType, title }) => {
     const isEmpty = hosts.some((o) => !o.ip);
     if (isEmpty) return message.error(`请输入${nodeType} 节点的ip`);
     form.setFieldsValue({
-      [nodeType]: hosts.map((o) => ({ ...o, errText: '666' })),
+      [nodeType]: hosts.map((o) => ({ ...o, status: 'loading' })),
     });
-    checkhostFecth({ host, password, user, savePassword, usePubkey }).then((res) => {
-      console.log(res);
+    checkhostFecth({ host, password, user, sshPort, savePassword, usePubkey }).then((res) => {
+      if (res.isSuccess) {
+        const hostStatus = res.data;
+        const _hosts = hosts.map((o) => {
+          if (!_.isNil(hostStatus[o.ip])) {
+            return {
+              ...o,
+              status: hostStatus[o.ip],
+            };
+          }
+        });
+        form.setFieldsValue({
+          [nodeType]: _hosts,
+        });
+      }
     });
   };
 
   return (
-    <Form.Item label={title} className={styles.formlist}>
+    <Form.Item label={<div className={styles.title}>{title}</div>} className={styles.formlist}>
       <Form.List name={nodeType} initialValue={[defaultValue]}>
         {(fields, { add, remove }) => {
           return (
@@ -111,14 +91,18 @@ const NodeFormList = ({ nodeType, title }) => {
                 <Col span={9}>IP</Col>
                 <Col span={8} />
                 <Col span={5}>
-                  节点状态
-                  <ReloadOutlined
-                    onClick={() => {
-                      const hosts = form.getFieldValue(nodeType);
-                      checkhost(hosts);
-                    }}
-                    className="cursor-pointer"
-                  />
+                  <Space size={8}>
+                    <span>节点状态</span>
+                    <LoadingIcon loading={checkLoading}>
+                      <ReloadOutlined
+                        onClick={() => {
+                          const hosts = form.getFieldValue(nodeType);
+                          checkhost(hosts);
+                        }}
+                        className="cursor-pointer"
+                      />
+                    </LoadingIcon>
+                  </Space>
                 </Col>
                 <Col span={2}>操作</Col>
               </Row>
@@ -150,8 +134,8 @@ const NodeFormList = ({ nodeType, title }) => {
                     </Col>
                     <Col span={2}>
                       <Button
+                        type="text"
                         disabled={fields.length === 1}
-                        loading={loading}
                         icon={
                           <DeleteOutlined onClick={() => remove(key)} className="cursor-pointer" />
                         }
@@ -190,15 +174,32 @@ const NodeFormList = ({ nodeType, title }) => {
   );
 };
 
+const portItemList = [
+  { label: '客户端连接tcp端口', name: ['clickhouse', 'ckTcpPort'], defaultValue: 9010 },
+  { label: 'Jdbc端口', name: ['clickhouse', 'httpPort'], defaultValue: 8123 },
+  { label: 'Rpc端口', name: ['clickhouse', 'rpcPort'], defaultValue: 8124 },
+  { label: '复杂查询的数据传输端口', name: ['clickhouse', 'exchPort'], defaultValue: 9300 },
+  { label: '复杂查询的控制指令端口', name: ['clickhouse', 'exStatPort'], defaultValue: 9400 },
+  { label: 'Tso端口', name: ['clickhouse', 'tsoPort'], defaultValue: 9910 },
+  { label: 'Rm端口', name: ['clickhouse', 'rmPort'], defaultValue: 9925 },
+  { label: 'Daemon端口', name: ['clickhouse', 'dmPort'], defaultValue: 9920 },
+];
+
 export default function NodeConfig() {
+  const formRef = useRef();
   return (
     <StepsForm.StepForm
       onFinish={async (v) => {
         console.log(v);
+
         return true;
       }}
-      name="envConfig2"
+      name="nodeConfig"
       title="节点配置"
+      initialValues={{
+        nodeVisitorWay: 'user',
+      }}
+      formRef={formRef}
     >
       <div className={styles.NodeConfig}>
         <ProFormRadio.Group
@@ -208,7 +209,6 @@ export default function NodeConfig() {
           fieldProps={{
             className: styles.RadioButton,
           }}
-          initialValue={'user'}
           options={[
             {
               label: '用户名密码',
@@ -225,12 +225,13 @@ export default function NodeConfig() {
             const isUser = nodeVisitorWay === 'user';
             return (
               <Row gutter={[8, 8]} className={styles.Row}>
-                <Col span={isUser ? 9 : 6}>
+                <Col span={isUser ? 9 : 9}>
                   <ProFormText
                     name="user"
                     fieldProps={{
                       autoComplete: 'off',
                     }}
+                    rules={[requiredRule]}
                     label={'节点用户名'}
                   />
                 </Col>
@@ -241,6 +242,7 @@ export default function NodeConfig() {
                       fieldProps={{
                         autoComplete: 'new-password',
                       }}
+                      rules={[requiredRule]}
                       name="password"
                       label={'节点密码'}
                     />
@@ -252,18 +254,51 @@ export default function NodeConfig() {
                       fieldProps={{
                         autoComplete: 'new-password',
                       }}
+                      rules={[requiredRule]}
                       name="password"
                       label={'节点私钥'}
                     />
                   </Col>
                 )}
                 <Col span={6}>
-                  <ProFormText name="sshPort" label={'节点SSH端口'} />
+                  <ProFormText rules={[requiredRule]} name="sshPort" label={'节点SSH端口'} />
                 </Col>
+                {isUser && (
+                  <Col span={24}>
+                    <div className={styles.horizontalForm}>
+                      <ProFormCheckbox
+                        {...{
+                          labelCol: { span: 6 },
+                          wrapperCol: { span: 18 },
+                        }}
+                        name="savePassword"
+                        label={'是否保存密码'}
+                      />
+                    </div>
+                  </Col>
+                )}
               </Row>
             );
           }}
         </ProFormDependency>
+
+        <div className={styles.horizontalForm}>
+          {portItemList.map((portItem) => {
+            return (
+              <ProFormDigit
+                {...{
+                  labelCol: { span: 6 },
+                  wrapperCol: { span: 18 },
+                }}
+                key={portItem.name[1]}
+                name={portItem.name}
+                label={portItem.label}
+                initialValue={portItem.defaultValue}
+              />
+            );
+          })}
+        </div>
+
         {nodeTypes.map((nodeType) => {
           return (
             <NodeFormList

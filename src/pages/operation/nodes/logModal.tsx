@@ -27,7 +27,7 @@ export default function LogModal({ trigger, ip, role, title }) {
   const getLogs = () => {
     const values = formRef.getFieldsValue();
     runAsync({
-      clusterName: currentCluster.cluster,
+      clusterName: currentCluster.clusterName,
       role,
       ip,
       ...values,
@@ -88,6 +88,7 @@ export default function LogModal({ trigger, ip, role, title }) {
           theme="vs-dark"
           height={300}
           options={{
+            readOnly: true,
             lineDecorationsWidth: 4,
             fontSize: 12,
             selectOnLineNumbers: true,

@@ -71,7 +71,7 @@ export default function Parameter() {
         console.log(res.data);
       }
     },
-    defaultParams: [currentCluster.cluster],
+    defaultParams: [currentCluster.clusterName],
   });
 
   useMount(() => {

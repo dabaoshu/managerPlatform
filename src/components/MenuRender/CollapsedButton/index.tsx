@@ -1,5 +1,4 @@
 import styles from './index.less';
-import { Button } from 'antd';
 import { MenuFoldOutlined, MenuUnfoldOutlined } from '@ant-design/icons';
 export default function CollapsedButton({ onCollapse, collapsed }) {
   const toggleCollapsed = () => onCollapse(collapsed);

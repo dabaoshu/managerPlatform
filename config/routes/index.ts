@@ -41,6 +41,12 @@ const routes: MenuDataItem[] = [
   //   component: '@/layouts/CommonLayout/CommonTokenLayout',
   //   routes: [userRoutes], exact: true
   // },
+  // {
+  //   name: '新建/接管集群',
+  //   path: '/init',
+  //   component: './new',
+  //   hideInMenu: true,
+  // },
   {
     path: '/',
     component: '@/layouts/CommonLayout',
@@ -51,7 +57,7 @@ const routes: MenuDataItem[] = [
         redirect: './home',
       },
       {
-        name: '集群',
+        name: '首页',
         icon: 'setting',
         path: '/home',
         component: './home',
@@ -115,16 +121,39 @@ const routes: MenuDataItem[] = [
             path: '/monitor',
             redirect: './dashboard',
           },
+
           {
             name: '监控',
             path: '/monitor/dashboard',
             component: './monitor/dashboard',
           },
           {
+            name: '新增告警',
+            path: '/monitor/alarm/new',
+            component: './monitor/alarm/new',
+          },
+          {
             name: '告警',
             path: '/monitor/alarm',
             component: './monitor/alarm',
+            routes: [
+              {
+                path: '/monitor/alarm',
+                redirect: './history',
+              },
+              {
+                name: '告警历史',
+                path: '/monitor/alarm/history',
+                component: './monitor/alarm/history',
+              },
+              {
+                name: '告警历史',
+                path: '/monitor/alarm/tactics',
+                component: './monitor/alarm/tactics',
+              },
+            ]
           },
+
         ],
       },
       {
@@ -132,6 +161,13 @@ const routes: MenuDataItem[] = [
         icon: 'FundProjectionScreenOutlined',
         path: '/tableMgr',
         component: './tableMgr',
+        hideChildrenInMenu: true,
+      },
+      {
+        name: '会话管理 ',
+        icon: 'FundProjectionScreenOutlined',
+        path: '/sessionMgr',
+        component: './sessionMgr',
         hideChildrenInMenu: true,
       },
       { path: '/*', component: './404', }

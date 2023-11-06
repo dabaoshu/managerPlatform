@@ -8,7 +8,7 @@ import { ProForm, ProFormText } from '@ant-design/pro-components';
 import { LockOutlined, UserOutlined } from '@ant-design/icons';
 import { login } from '@/services/login';
 import { md5Encryption } from '@/utils/encrypt';
-import { useMount } from 'ahooks';
+import { useMount, useRequest } from 'ahooks';
 import loginServer from '@/module/login.server';
 const initPage = '/operation';
 function Login() {
@@ -16,6 +16,15 @@ function Login() {
   const history = useHistory();
   const userName = 'admin';
   const redirectRef = useRef('');
+  const { runAsync, loading } = useRequest(login, { manual: true });
+
+  useMount(() => {
+    loginServer.login({
+      userName: 'temp',
+      token: 'token',
+    });
+  });
+
   useMount(() => {
     const { query = {} } = history.location;
     const { redirect } = query;
@@ -23,12 +32,10 @@ function Login() {
   });
   const onFinish = async (values) => {
     try {
-      const { isSuccess, data, ...s } = await login({
+      const { isSuccess, data } = await runAsync({
         ...values,
         password: md5Encryption(values.password),
       });
-      console.log(s);
-
       if (!isSuccess) return;
       message.success(
         formatMessage({
@@ -130,6 +137,7 @@ function Login() {
                 block
                 htmlType="submit"
                 size="large"
+                loading={loading}
               >
                 {formatMessage({
                   id: 'user.login.login',

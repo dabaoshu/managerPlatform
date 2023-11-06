@@ -4,10 +4,10 @@ import CollapsedButton from '@/components/MenuRender/CollapsedButton';
 import MenuHeader from '@/components/MenuRender/MenuHeader';
 
 import styles from './index.less';
-import { Link, useModel } from 'umi';
+import { Link, useHistory, useModel } from 'umi';
 import { transformRoute, getMatchMenu } from '@umijs/route-utils';
 import { useMemo } from 'react';
-import { WithExceptionOpChildren } from '@/components/Exception';
+import { WithExceptionOpChildren } from '@/layouts/Exception';
 
 // const Footer: React.FC = () => {
 //   const { formatMessage } = useIntl();
@@ -23,7 +23,7 @@ export default (props) => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const { layoutSettings } = initialState;
   const { children } = props;
-
+  const history = useHistory();
   const onCollapse = (collapsed) => {
     setInitialState({
       ...initialState,
@@ -73,8 +73,6 @@ export default (props) => {
     const { menuData } = transformRoute(props?.route?.routes || [], undefined, undefined, true);
     return getMatchMenu(location.pathname, menuData).pop() || {};
   }, [location?.pathname, props?.route?.routes]);
-
-  console.log(currentPathConfig);
 
   return (
     <div className={styles.sideRoot}>

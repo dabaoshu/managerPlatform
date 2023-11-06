@@ -17,19 +17,19 @@ export const ClusterBadge = ({ className = '', item }) => {
   return <Badge className={classnames(className)} status={status} text={text} />;
 };
 
-const ClusterItem = ({ item, active }) => {
+const ClusterItem = ({ item, active, onClick = () => {} }) => {
   return (
-    <div className={classnames(styles['cluster-item-box'])}>
+    <div className={classnames(styles['cluster-item-box'])} onClick={onClick}>
       <div className={styles['cluster-item-current']}>
         {active && <CheckCircleFilled style={{ color: 'rgb(0, 180, 42)' }} />}
       </div>
       <div className={styles['cluster-item']}>
         <div className={styles['cluster-item-info']}>
-          <div className={styles['cluster-item-info-name']}>{item.cluster}</div>
+          <div className={styles['cluster-item-info-name']}>{item.clusterName}</div>
           <ClusterBadge item={item} className={styles['cluster-item-status']} />
         </div>
         <div className={styles['cluster-item-version']}>
-          {item.pkgName}-{item.version}
+          {item.packageName}-{item.packageVersion}
         </div>
       </div>
     </div>
@@ -44,11 +44,12 @@ export default function MenuHeader(props) {
   } = props;
 
   const [open, setOpen] = useState(false);
-  const [{ loadingEffects, clusterList, currentCluster }, { setState }] = useModel('clusterModel');
-  console.log('clusterList', clusterList);
-
+  const [{ loadingEffects, clusterList, currentCluster }, { switchCluster }] =
+    useModel('clusterModel');
   const list = useMemo(() => {
-    return clusterList.filter((clusterItem) => clusterItem.cluster !== currentCluster.cluster);
+    return clusterList.filter(
+      (clusterItem) => clusterItem.clusterName !== currentCluster.clusterName,
+    );
   }, [clusterList, currentCluster]);
 
   const hide = () => {
@@ -68,9 +69,16 @@ export default function MenuHeader(props) {
       <div className={styles.popoverContent}>
         <div className={styles['cluster-box']}>
           <div className={styles['cluster-list']}>
-            {currentCluster.cluster && <ClusterItem item={currentCluster} active={true} />}
+            {currentCluster.clusterName && <ClusterItem item={currentCluster} active={true} />}
             {list.map((o) => {
-              return <ClusterItem key={o.cluster} item={o} active={false} />;
+              return (
+                <ClusterItem
+                  key={o.clusterName}
+                  onClick={() => switchCluster(o)}
+                  item={o}
+                  active={false}
+                />
+              );
             })}
           </div>
           <Divider style={{ margin: '8px 12px' }} />
@@ -106,7 +114,7 @@ export default function MenuHeader(props) {
       }}
       arrow={false}
     >
-      <Tooltip title={`当前集群:${currentCluster?.cluster}`}>
+      <Tooltip title={currentCluster?.clusterName ? `当前集群:${currentCluster?.clusterName}` : ''}>
         <div
           className={classnames(styles.MenuHeader, {
             [styles.active]: open,
@@ -116,7 +124,7 @@ export default function MenuHeader(props) {
           <div className={styles.logo}>{logo}</div>
           {!collapsed && (
             <div className={styles['cluster-name']}>
-              <div className={styles.text}>{currentCluster?.cluster}</div>
+              <div className={styles.text}>{currentCluster?.clusterName}</div>
               <ExpandIcon open={open} />
             </div>
           )}

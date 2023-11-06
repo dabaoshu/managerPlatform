@@ -5,9 +5,9 @@ import AppCluster from './appCluster';
 export default (props) => {
   return (
     <CommonTokenLayout {...props}>
-      <AppCluster>
-        <SideLayout {...props} />
-      </AppCluster>
+      {/* <AppCluster> */}
+      <SideLayout {...props} />
+      {/* </AppCluster> */}
     </CommonTokenLayout>
   );
 };

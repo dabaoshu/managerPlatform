@@ -3,7 +3,6 @@ import MonacoWebpackPlugin from 'monaco-editor-webpack-plugin';
 import getProxy from './proxy';
 import routes from './routes';
 import theme from './theme';
-import metadata from 'monaco-editor/esm/metadata';
 const { NODE_ENV, BASE = '/', PUBLIC_PATH = '/' } = process.env;
 
 const ROUTER_BASE = BASE.lastIndexOf('/') === BASE.length - 1 ? BASE : `${BASE}/`;
@@ -17,7 +16,7 @@ const serverList = {
   "1162": 'http://10.45.46.116:8910'
 };
 
-const target = serverList['1162']
+const target = serverList['116']
 const proxy = getProxy(NODE_ENV, target)
 
 const define = {
@@ -57,8 +56,8 @@ export default defineConfig({
   // lessLoaderOptions: {
   //   javascriptEnabled: true,
   // },
-  devtool: NODE_ENV === 'production' ? 'cheap-module-source-map' : 'eval',
-  // devtool: NODE_ENV === 'production' ? 'source-map' : 'source-map',
+  // devtool: NODE_ENV === 'production' ? 'source-map' : 'eval',
+  devtool: NODE_ENV === 'production' ? 'source-map' : 'source-map',
   // devtool: 'eval',
   proxy,
   nodeModulesTransform: { type: 'none', exclude: [] },
@@ -95,8 +94,9 @@ export default defineConfig({
             cacheGroups: {
               react: {
                 name: 'react',
-                priority: 20,
-                test: /[\\/]node_modules[\\/](react|react-dom|react-dom-router)[\\/]/,
+                priority: -10,
+                enforce: true,
+                test: /[\\/]node_modules[\\/](react|react-dom|react-router|react-router-dom)[\\/]/,
               },
               antdesigns: {
                 name: 'antdesigns',

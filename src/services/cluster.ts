@@ -1,7 +1,6 @@
 import { request } from 'umi';
 
 const url = '/api/v1/ck';
-const createUrl = '/api/v1/deploy/ck';
 
 export const ClusterApi = {
   getCluster: () => request<API.BaseRes>(`${url}/cluster`, {
@@ -29,11 +28,11 @@ export const ClusterApi = {
   },
 
   /* 集群总览*/
-  getstatics: () => request<API.BaseRes>(`${url}/getstatics`, {
+  getstatics: (clusterName: string) => request<API.BaseRes>(`${url}/getstatics/${clusterName}`, {
     method: 'GET',
   }),
   /* 节点管理*/
-  getinstances: () => request<API.BaseRes>(`${url}/getinstances`, {
+  getinstances: (clusterName: string) => request<API.BaseRes>(`${url}/getinstances/${clusterName}`, {
     method: 'GET',
   }),
   onlineClusterNode(payload: { clusterName?, ip?, role?}) {
@@ -60,10 +59,17 @@ export const ClusterApi = {
     });
   },
   // 获取节点列表的
-  getClusterInfo: (id) => {
-    return request<API.BaseRes>(`${url}/get/${id}`, {
+  getClusterInfo: (clusterName: string, nodeType: string) => {
+    return request<API.BaseRes>(`${url}/get/${clusterName}/${nodeType}`, {
       method: "get"
     })
+  },
+  // 创建集群
+  createCluster(params) {
+    return request<API.BaseRes>(`/api/v1/deploy/ck`, {
+      data: params,
+      method: "POST"
+    });
   },
 
   /**未使用 */
@@ -85,9 +91,7 @@ export const ClusterApi = {
   importCluster(params) {
     return request.post(`${url}/cluster`, params);
   },
-  createCluster(params, force) {
-    return request.post(`${createUrl}/?force=${force}`, params);
-  },
+
   updateCluster(params) {
     return request.put(`${url}/cluster`, params);
   },

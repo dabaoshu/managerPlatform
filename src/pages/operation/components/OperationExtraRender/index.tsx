@@ -15,31 +15,31 @@ const ClusterUpdateModal = ({ open, onCancel }) => {
 };
 
 const restartNodes = [
-  {
-    title: '集群',
-    key: 'cluster',
-    type: 'cluster',
-  },
-  {
-    title: 'server',
-    key: 'server',
-    type: 'node',
-  },
-  {
-    title: 'tso',
-    key: 'tso',
-    type: 'node',
-  },
-  {
-    title: 'Resourcemanager',
-    key: 'resourcemanager',
-    type: 'node',
-  },
-  {
-    title: 'Daemonmanager',
-    key: 'daemon',
-    type: 'node',
-  },
+  // {
+  //   title: '集群',
+  //   key: 'cluster',
+  //   type: 'cluster',
+  // },
+  // {
+  //   title: 'server',
+  //   key: 'server',
+  //   type: 'node',
+  // },
+  // {
+  //   title: 'tso',
+  //   key: 'tso',
+  //   type: 'node',
+  // },
+  // {
+  //   title: 'Resourcemanager',
+  //   key: 'resourcemanager',
+  //   type: 'node',
+  // },
+  // {
+  //   title: 'Daemonmanager',
+  //   key: 'daemon',
+  //   type: 'node',
+  // },
   {
     title: '读worker',
     key: 'worker',
@@ -50,11 +50,11 @@ const restartNodes = [
     key: 'worker-write',
     type: 'node',
   },
-  {
-    title: 'Fdb元数据',
-    key: 'fdb',
-    type: 'node',
-  },
+  // {
+  //   title: 'Fdb元数据',
+  //   key: 'fdb',
+  //   type: 'node',
+  // },
 ];
 
 export const OperationExtraRender = () => {
@@ -93,9 +93,9 @@ export const OperationExtraRender = () => {
   const handleRestart = (item) => {
     // 重启集群
     if (item.type === 'cluster') {
-      onlineClusterNode({ clusterName: currentCluster.cluster });
+      onlineClusterNode({ clusterName: currentCluster.clusterName });
     } else {
-      onlineClusterNode({ clusterName: currentCluster.cluster, role: item.key });
+      onlineClusterNode({ clusterName: currentCluster.clusterName, role: item.key });
     }
   };
 

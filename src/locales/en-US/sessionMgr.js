@@ -1,0 +1,15 @@
+export default {
+  'session.Sessions Management': 'Sessions Management',
+  'session.Open Sessions': 'Open Sessions',
+  'session.Slow Sessions': 'Slow Sessions',
+  'session.Limit Count': 'Limit Count',
+  'session.Query Start Time': 'Query Start Time',
+  'session.Query Duration': 'Query Duration(ms)',
+  'session.Query': 'Query',
+  'session.Initial User': 'Initial User',
+  'session.Initial Query ID': 'Initial Query ID',
+  'session.Initial Address': 'Initial Address',
+  'session.Thread Numbers': 'Thread Numbers',
+  'session.Kill': 'Kill',
+  'session.Node Host': 'Node Host',
+}

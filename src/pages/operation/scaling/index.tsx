@@ -8,6 +8,7 @@ import { EditableProTable, ProTable } from '@ant-design/pro-components';
 import { BatchIpCreateModal } from '@/pages/new/batchIpCreateModal';
 import { useMount, useRequest, useSetState } from 'ahooks';
 import { ClusterApi } from '@/services/cluster';
+import { useModel } from 'umi';
 
 interface RowData {
   status: string;
@@ -29,14 +30,17 @@ const getDefaultRow = () => {
 
 export default function Scaling(props) {
   const history = useHistory();
+  const [{ currentCluster }] = useModel('clusterModel');
   const { nodeType, type } = useParams<{ nodeType: string; type: 'down' | 'up' }>();
   const isUp = type === 'up'; // 扩容
   const [{ dataSource }, setState] = useSetState({
     originDataSource: [],
     dataSource: [],
   });
+  console.log(nodeType);
+
   const { loading } = useRequest(ClusterApi.getClusterInfo, {
-    defaultParams: [nodeType],
+    defaultParams: [currentCluster.clusterName, nodeType],
     onSuccess: (res) => {
       if (res.isSuccess) {
         setState({
@@ -185,6 +189,16 @@ export default function Scaling(props) {
             className: styles.toolbar,
           }}
         />
+        {isUp && (
+          <footer className={styles.footer}>
+            <div className={styles.left}>已添加{}个节点</div>
+            <div className={styles.right}>
+              <Button size="large" type="primary">
+                确定
+              </Button>
+            </div>
+          </footer>
+        )}
       </CsContent>
     </CsPage>
   );

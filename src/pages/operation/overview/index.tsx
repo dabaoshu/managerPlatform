@@ -6,6 +6,7 @@ import styles from './index.less';
 import { CsContent, CsHeader, CsPage } from '@/components/CsPage';
 import { OperationLeftRender } from '../components/OperationLeftRender';
 import { OperationExtraRender } from '../components/OperationExtraRender';
+import { useModel } from 'umi';
 type Static = { total: number; run: number; stop: number };
 const InfoText: FC<{ item: Partial<Static>; count?: boolean }> = ({ item, count = true }) => {
   const { total = 0, run = 0, stop = 0 } = item;
@@ -97,7 +98,7 @@ const BaseInfoCard = ({ data }) => {
 };
 
 export default function Overview() {
-  // const [{ user, loading }] = useModel('clusterModel');
+  const [{ currentCluster }] = useModel('clusterModel');
   const [data, setData] = useSetState({
     serverStatics: {},
     resourcemanagerStatics: {},
@@ -110,6 +111,7 @@ export default function Overview() {
     tableCount: 0,
   });
   const { loading } = useRequest(ClusterApi.getstatics, {
+    defaultParams: [currentCluster.clusterName],
     onSuccess: (res) => {
       if (res.isSuccess && res.data) {
         setData(res.data);

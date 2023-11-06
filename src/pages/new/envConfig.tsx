@@ -5,12 +5,7 @@ import { useRequest, useSetState } from 'ahooks';
 import { PackageApi } from '@/services/package';
 export default function EnvConfig() {
   const [{ versionList }, setStatic] = useSetState({
-    versionList: [
-      {
-        label: ' o.pkgName',
-        value: ' o.pkgName',
-      },
-    ],
+    versionList: [{}],
   });
   const { loading: versionLoading } = useRequest(PackageApi.getList, {
     defaultParams: ['all'],
@@ -34,13 +29,12 @@ export default function EnvConfig() {
       title="环境配置"
       initialValues={{
         createWay: 'new',
-        clusterName: 'clusterName',
       }}
     >
       <div>
         <ProFormText
           label="集群名称"
-          name={'clusterName'}
+          name={['clickhouse', 'clusterName']}
           extra="必须字母开头，最多 64 个字符，可以使用字母（大小写不敏感）、数字和_"
           rules={[
             {
@@ -62,10 +56,10 @@ export default function EnvConfig() {
               label: '部署新集群',
               value: 'new',
             },
-            {
-              label: '接管现有集群',
-              value: 'old',
-            },
+            // {
+            //   label: '接管现有集群',
+            //   value: 'old',
+            // },
           ]}
         />
         <Form.Item
@@ -81,7 +75,8 @@ export default function EnvConfig() {
               <ProFormSelect
                 fieldProps={{ loading: versionLoading }}
                 label="版本"
-                name="packageVersion"
+                name={['clickhouse', 'packageVersion']}
+                // name="packageVersion"
                 preserve={false}
                 options={versionList}
                 dependencies={['createWay']}

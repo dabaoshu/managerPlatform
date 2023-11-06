@@ -175,7 +175,9 @@ type responseHandleOptions = {
 const responseAdapterHandle = async <T>(ctx: Context, next: () => void) => {
   return (next as any)().then(() => {
     if (!ctx) return;
-    if (ctx?.res?.retCode === "5020" || ctx?.res?.retCode === "5022") {
+    console.log(ctx);
+
+    if (["5020", "5021", "5022"].includes(ctx?.res?.retCode)) {
       loginServer.logout(false)
     }
     ctx.res = AdapterHandle(ctx?.res)
