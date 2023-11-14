@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useRef } from 'react';
 import { Form, Button, message } from 'antd';
 import { useHistory } from 'react-router-dom';
 import styles from './index.less';
@@ -11,6 +11,7 @@ import { md5Encryption } from '@/utils/encrypt';
 import { useMount, useRequest } from 'ahooks';
 import loginServer from '@/module/login.server';
 const initPage = '/operation';
+
 function Login() {
   const { formatMessage } = useIntl();
   const history = useHistory();

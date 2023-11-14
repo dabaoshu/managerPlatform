@@ -5,7 +5,7 @@ import { useRequest, useSetState } from 'ahooks';
 import { PackageApi } from '@/services/package';
 export default function EnvConfig() {
   const [{ versionList }, setStatic] = useSetState({
-    versionList: [{}],
+    versionList: [],
   });
   const { loading: versionLoading } = useRequest(PackageApi.getList, {
     defaultParams: ['all'],
@@ -72,21 +72,35 @@ export default function EnvConfig() {
               return null;
             }
             return (
-              <ProFormSelect
-                fieldProps={{ loading: versionLoading }}
-                label="版本"
-                name={['clickhouse', 'packageVersion']}
-                // name="packageVersion"
-                preserve={false}
-                options={versionList}
-                dependencies={['createWay']}
-                rules={[
-                  {
-                    required: true,
-                    message: '请选择',
-                  },
-                ]}
-              />
+              <>
+                <ProFormSelect
+                  fieldProps={{ loading: versionLoading }}
+                  label="版本"
+                  name={['clickhouse', 'pkgName']}
+                  onChange={(val) => {
+                    const target = versionList.find((o) => o.value === val);
+                    form.setFieldValue(['clickhouse', 'pkgVersion'], target.pkgVersion);
+                  }}
+                  preserve={false}
+                  options={versionList}
+                  dependencies={['createWay']}
+                  rules={[
+                    {
+                      required: true,
+                      message: '请选择',
+                    },
+                  ]}
+                />
+                <ProFormText
+                  formItemProps={{
+                    hidden: true,
+                  }}
+                  label="版本号"
+                  name={['clickhouse', 'pkgVersion']}
+                  preserve={false}
+                  dependencies={['createWay']}
+                />
+              </>
             );
           }}
         </Form.Item>

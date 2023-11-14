@@ -5,11 +5,9 @@ import { useRequest, useSetState } from 'ahooks';
 import { Button, Checkbox, Form } from 'antd';
 import styles from './index.less';
 import MonacoEditor from 'react-monaco-editor';
-import { useModel } from 'umi';
 import { SyncOutlined } from '@ant-design/icons';
-export default function LogModal({ trigger, ip, role, title }) {
+export default function LogModal({ trigger, ip, role, title, clusterName }) {
   const [formRef] = Form.useForm();
-  const [{ currentCluster }] = useModel('clusterModel');
   const [{ logValue }, setState] = useSetState({
     logValue: ``,
   });
@@ -27,15 +25,21 @@ export default function LogModal({ trigger, ip, role, title }) {
   const getLogs = () => {
     const values = formRef.getFieldsValue();
     runAsync({
-      clusterName: currentCluster.clusterName,
+      clusterName,
       role,
       ip,
       ...values,
     });
   };
 
+  const onOpenMount = (open) => {
+    if (open) {
+      getLogs();
+    }
+  };
+
   return (
-    <TriggerModal title={title} trigger={trigger} footer={false}>
+    <TriggerModal title={title} trigger={trigger} footer={false} onOpenMount={onOpenMount}>
       <div>
         <ProForm
           layout="inline"
@@ -99,7 +103,7 @@ export default function LogModal({ trigger, ip, role, title }) {
               enabled: true, // 是否启用小地图的渲染
             },
           }}
-          value={logValue}
+          value={loading ? '正在加载中...' : logValue}
         />
       </div>
     </TriggerModal>

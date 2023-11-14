@@ -1,10 +1,13 @@
 import { TimeFilter } from '@/components/timeFilter';
+import { AlarmApi } from '@/services/alarm';
 import { SearchOutlined } from '@ant-design/icons';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import { Input, Space } from 'antd';
 import React, { useRef } from 'react';
 
 export default function AlarmHistory() {
+  const {} = useRequest(AlarmApi.getAlarm, {});
   const actionRef = useRef<ActionType>();
   const columns: ProColumns[] = [
     {

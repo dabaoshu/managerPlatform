@@ -94,7 +94,14 @@ export default function TableMgr() {
       width: 300,
       fixed: 'right',
       render: (text, record, _, action) => [
-        <LogModal trigger={<a>查看建表语句</a>} ip="" title={''} role={''} key="view" />,
+        <LogModal
+          trigger={<a>查看建表语句</a>}
+          clusterName=""
+          ip=""
+          title={''}
+          role={''}
+          key="view"
+        />,
         <a key="reserved" onClick={() => {}}>
           备份
         </a>,

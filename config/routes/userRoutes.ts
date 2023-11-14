@@ -3,6 +3,7 @@ const userRoutes: IBestAFSRoute =
 {
   path: '/user',
   layout: false,
+  component: "@/layouts/CommonLayout/AntdConfigProvider",
   routes: [
     {
       path: '/user/',

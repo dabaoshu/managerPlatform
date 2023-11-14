@@ -1,12 +1,17 @@
 import type { MonacoEditorProps } from 'react-monaco-editor';
-import MonacoEditor from 'react-monaco-editor';
+import MonacoEditor, { monaco } from 'react-monaco-editor';
+import { language as sqlLanguage } from 'monaco-editor/esm/vs/basic-languages/sql/sql.js';
+console.log(monaco.languages.getLanguages());
+
 export function SqlEditor(props: MonacoEditorProps) {
   const { options = {}, ...rest } = props;
   return (
     <MonacoEditor
       theme="vs-dark"
       height={300}
+      language="sql"
       options={{
+        automaticLayout: true,
         lineDecorationsWidth: 4,
         fontSize: 12,
         selectOnLineNumbers: true,
@@ -22,302 +27,47 @@ export function SqlEditor(props: MonacoEditorProps) {
   );
 }
 
-// monaco.languages.register({
-//   id: 'clickhouse',
-//   extensions: ['.sql'],
-//   aliases: ['ClickHouse', 'clickhouse'],
-//   mimetypes: ['text/x-clickhouse'],
-// });
-
-// monaco.languages.setMonarchTokensProvider('clickhouse', {
-//   keywords: [
-//     'alter',
-//     'and',
-//     'as',
-//     'asc',
-//     'between',
-//     'by',
-//     'count',
-//     'create',
-//     'delete',
-//     'desc',
-//     'distinct',
-//     'drop',
-//     'from',
-//     'group',
-//     'having',
-//     'in',
-//     'insert',
-//     'into',
-//     'is',
-//     'join',
-//     'like',
-//     'not',
-//     'on',
-//     'or',
-//     'order',
-//     'select',
-//     'set',
-//     'table',
-//     'union',
-//     'update',
-//     'values',
-//     'where',
-//     'limit',
-//     'Int8',
-//     'Int16',
-//     'Int32',
-//     'Int64',
-//     'Int128',
-//     'Int256',
-//     'UInt8',
-//     'UInt16',
-//     'UInt32',
-//     'UInt64',
-//     'UInt128',
-//     'UInt256',
-//     'Float32',
-//     'Float64',
-//     'Decimal',
-//     'String',
-//     'FixedString',
-//     'UUID',
-//     'Date',
-//     'Date32',
-//     'DateTime',
-//     'DateTime64',
-//     'Enum',
-//     'LowCardinality',
-//     'Array',
-//     'AggregateFunction',
-//     'Nested',
-//     'Tuple',
-//     'Nullable',
-//     'SimpleAggregateFunction',
-//     'ALL',
-//     'ANY',
-//     'ASOF',
-//     'INNER',
-//     'LEFT',
-//     'RIGHT',
-//     'FULL',
-//     'CROSS',
-//     'OUTER',
-//     'SEMI',
-//     'ANTI',
-//     'JOIN',
-//     'USING',
-//     'WITH',
-//     'CUBE',
-//     'TOTALS',
-//     'HAVING',
-//     'ORDER',
-//     'BY',
-//     'FROM',
-//     'TO',
-//     'FILL',
-//     'STEP',
-//     'LIMIT',
-//     'ARRAY',
-//     'DISTINCT',
-//     'EXCEPT',
-//     'FORMAT',
-//     'INTO',
-//     'OUTFILE',
-//     'PREWHERE',
-//     'SAMPLE',
-//     'UNION',
-//     'FROM',
-//     'DATABASE',
-//     'TABLE',
-//     'VIEW',
-//     'MATERIALIZED',
-//     'DICTIONARY',
-//     'FUNCTION',
-//     'USER',
-//     'ROLE',
-//     'ROW',
-//     'POLICY',
-//     'QUOTA',
-//     'SETTINGS',
-//     'PROFILE',
-//     'ALTER',
-//     'COLUMN',
-//     'PARTITION',
-//     'DELETE',
-//     'UPDATE',
-//     'INDEX',
-//     'CONSTRANINT',
-//     'TTL',
-//     'USER',
-//     'QUOTA',
-//     'ROLE',
-//     'PROJECTION',
-//     'SYSTEM',
-//     'SHOW',
-//     'GRANT',
-//     'EXPLAIN',
-//     'REVOKE',
-//     'ATTACH',
-//     'DESCRIBE',
-//     'DETACH',
-//     'DROP',
-//     'EXISTS',
-//     'KILL',
-//     'OPTIMIZE',
-//     'RENAME',
-//     'EXCHANGE',
-//     'SET',
-//     'TRUNCATE',
-//     'USE',
-//     'WATCH',
-//     'ON',
-//     'IN',
-//     'CLUSTER',
-//     'ROLLUP',
-//     'SYNC',
-//     'NULL',
-//     'CAST',
-//     'MergeTree',
-//     'SummingMergeTree',
-//     'AggregatingMergeTree',
-//     'CollapsingMergeTree',
-//     'VersionedCollapsingMergeTree',
-//     'GraphiteMergeTree',
-//     'ReplacingMergeTRee',
-//     'ReplicatedMergeTree',
-//     'ReplicatedSummingMergeTree',
-//     'ReplicatedReplacingMergeTree',
-//     'ReplicatedAggregatingMergeTree',
-//     'ReplicatedCollapsingMergeTree',
-//     'ReplicatedVersionedCollapsingMergeTree',
-//     'ReplicatedGraphiteMergeTree',
-//   ],
-//   ignoreCase: true,
-//   operators: [
-//     '=',
-//     '>',
-//     '<',
-//     '!',
-//     '~',
-//     '>=',
-//     '<=',
-//     '==',
-//     '===',
-//     '!=',
-//     '!==',
-//     '+',
-//     '-',
-//     '*',
-//     '/',
-//     '&',
-//     '|',
-//     '^',
-//     '%',
-//     '<<',
-//     '>>',
-//     '>>>',
-//     '+=',
-//     '-=',
-//     '*=',
-//     '/=',
-//     '&=',
-//     '|=',
-//     '^=',
-//     '%=',
-//     '<<=',
-//     '>>=',
-//     '>>>=',
-//     '=>',
-//     '->',
-//     '++',
-//     '--',
-//   ],
-//   builtins: [
-//     // 内置函数
-//     'count',
-//     'min',
-//     'max',
-//     'sum',
-//     'avg',
-//     'any',
-//     'stddevPop',
-//     'stddevSamp',
-//     // ...其他内置函数
-//   ],
-
-//   dataTypes: [
-//     // 数据类型
-//     'Int8',
-//     'Int16',
-//     'Int32',
-//     'Int64',
-//     'Int128',
-//     'Int256',
-//     'UInt8',
-//     'UInt16',
-//     'UInt32',
-//     'UInt64',
-//     'UInt128',
-//     'UInt256',
-//     'Float32',
-//     'Float64',
-//     'Decimal',
-//     'String',
-//     'FixedString',
-//     'UUID',
-//     'Date',
-//     'Date32',
-//     'DateTime',
-//     'DateTime64',
-//     'Enum',
-//     'LowCardinality',
-//     'Array',
-//     'AggregateFunction',
-//     'Nested',
-//     'Tuple',
-//     'Nullable',
-//     'SimpleAggregateFunction',
-//     'ALL',
-//     'ANY',
-//     'ASOF',
-//     'INNER',
-//     'LEFT',
-//     'RIGHT',
-//     // ...其他数据类型
-//   ],
-//   symbols: /[=><!~?:&|+\-*/^%]+/,
-
-//   tokenizer: {
-//     root: [
-//       [/[A-Z][\w\$]*/, { token: 'keyword' }],
-//       // Operators
-//       [/(\+|-|\*|\/|<|>|=|!|%|&|\^|\|)/, { token: 'operator' }],
-//       // [/@operators/, { token: 'operator' }],
-//       // Numbers
-//       [/\d+\.\d+/, 'number.float'],
-//       [/\d+/, 'number'],
-//       // Strings
-//       [/\'([^\'\\]|\\.)*\'/, 'string'],
-//       // Identifiers and default
-//       [/[a-z]\w*/, 'identifier'],
-//       [/[A-Z]\w*/, 'type.identifier'],
-//       // White spaces and comments
-//       { include: '@whitespace' },
-//       [/--.*$/, 'comment'],
-//       [/\/\*/, { token: 'comment.quote', bracket: '@open', next: '@comment' }],
-//     ],
-
-//     comment: [
-//       [/[^*/]+/, 'comment'],
-//       [/\*\//, { token: 'comment.quote', bracket: '@close', next: '@pop' }],
-//       [/./, 'comment'],
-//     ],
-
-//     whitespace: [
-//       [/[ \t\r\n]+/, 'white'],
-//       [/\/\*/, 'comment', '@comment'],
-//       [/\/\/.*$/, 'comment'],
-//     ],
-//   },
-// });
+monaco.languages.registerCompletionItemProvider('sql', {
+  provideCompletionItems: (model, position) => {
+    const suggestions = [];
+    const { lineNumber, column } = position;
+    const textBeforePointer = model.getValueInRange({
+      startLineNumber: lineNumber,
+      startColumn: 0,
+      endLineNumber: lineNumber,
+      endColumn: column,
+    });
+    const contents = textBeforePointer.trim().split(/\s+/);
+    const lastContents = contents[contents?.length - 1]; // 获取最后一段非空字符串
+    if (lastContents) {
+      const keywords = [...sqlLanguage.keywords];
+      const sqlConfigKey = [
+        { key: 'operators', type: monaco.languages.CompletionItemKind.Operator },
+        { key: 'builtinFunctions', type: monaco.languages.CompletionItemKind.Function },
+      ];
+      const codeSet = new Set();
+      sqlConfigKey.forEach(({ key, type }) => {
+        sqlLanguage[key].forEach((sql) => {
+          codeSet.add(sql);
+          suggestions.push({
+            label: sql, // 显示的提示内容;默认情况下，这也是选择完成时插入的文本。
+            insertText: sql, // 选择此完成时应插入到文档中的字符串或片段
+            kind: type,
+          });
+        });
+      });
+      keywords.forEach((word) => {
+        if (!codeSet.has(word)) {
+          suggestions.push({
+            label: word, // 显示的提示内容;默认情况下，这也是选择完成时插入的文本。
+            insertText: word, // 选择此完成时应插入到文档中的字符串或片段
+            kind: monaco.languages.CompletionItemKind.Keyword,
+          });
+        }
+      });
+    }
+    return {
+      suggestions,
+    };
+  },
+});

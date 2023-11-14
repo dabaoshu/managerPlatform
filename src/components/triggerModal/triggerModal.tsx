@@ -7,6 +7,8 @@ interface TriggerModalProps extends ModalProps {
   trigger?: JSX.Element;
   /** @name 打开关闭的事件 */
   onOpenChange?: (visible: boolean) => void;
+  /** @name 打开的回调 */
+  onOpenMount?: (open) => void;
 }
 
 export function TriggerModal(props: TriggerModalProps) {
@@ -17,13 +19,17 @@ export function TriggerModal(props: TriggerModalProps) {
     onOpenChange,
     width,
     children,
+    onOpenMount,
     ...rest
   } = props;
   const [open, setOpen] = useMergedState<boolean>(!!propVisible, {
     value: propsOpen || propVisible,
     onChange: onOpenChange,
   });
-  console.log(open);
+
+  useEffect(() => {
+    onOpenMount(open);
+  }, [open]);
 
   const triggerDom = useMemo(() => {
     if (!trigger) {

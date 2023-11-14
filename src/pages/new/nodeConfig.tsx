@@ -18,7 +18,7 @@ import { BatchIpCreateModal } from './batchIpCreateModal';
 import LoadingIcon from '@/components/loadingIcon';
 import { nodeTypes, statusMap } from './utils';
 import { requiredRule } from '@/utils/form';
-import { useRef } from 'react';
+import { useRef, useState } from 'react';
 
 const defaultValue = { ip: '', status: 'default' };
 
@@ -82,11 +82,14 @@ const NodeFormList = ({ nodeType, title }) => {
   };
 
   return (
-    <Form.Item label={<div className={styles.title}>{title}</div>} className={styles.formlist}>
+    <Form.Item
+      label={<div className={styles.title}>{title}</div>}
+      className={classnames(styles.formlist)}
+    >
       <Form.List name={nodeType} initialValue={[defaultValue]}>
         {(fields, { add, remove }) => {
           return (
-            <>
+            <div className={styles.border}>
               <Row className={classnames(styles.formlistheader, styles.row)} gutter={[16, 8]}>
                 <Col span={9}>IP</Col>
                 <Col span={8} />
@@ -153,8 +156,6 @@ const NodeFormList = ({ nodeType, title }) => {
                     title={`批量添加 ${nodeType} 节点`}
                     trigger={<span className="cursor-pointer">批量添加</span>}
                     onFinish={(ips) => {
-                      console.log(ips);
-
                       const field = form.getFieldValue(nodeType);
                       const ipList = ips.map((ip) => ({
                         ip,
@@ -166,7 +167,7 @@ const NodeFormList = ({ nodeType, title }) => {
                   />
                 </Space>
               </Form.Item>
-            </>
+            </div>
           );
         }}
       </Form.List>
@@ -183,7 +184,38 @@ const portItemList = [
   { label: 'Tso端口', name: ['clickhouse', 'tsoPort'], defaultValue: 9910 },
   { label: 'Rm端口', name: ['clickhouse', 'rmPort'], defaultValue: 9925 },
   { label: 'Daemon端口', name: ['clickhouse', 'dmPort'], defaultValue: 9920 },
+  { label: 'hdfs端口', name: 'hdfsPort', defaultValue: 8020 },
 ];
+
+const AdvancedConfig = () => {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className={classnames(styles.horizontalForm, styles.border)}>
+      <div className={styles.advance}>
+        <span className={styles.left}>高级配置</span>
+        <a className={styles.right} onClick={() => setOpen(!open)}>
+          {open ? '收缩' : '展开'}
+        </a>
+      </div>
+      <div style={{ display: open ? 'block' : 'none' }}>
+        {portItemList.map((portItem) => {
+          return (
+            <ProFormDigit
+              {...{
+                labelCol: { span: 6 },
+                wrapperCol: { span: 18 },
+              }}
+              key={portItem.name[1]}
+              name={portItem.name}
+              label={portItem.label}
+              initialValue={portItem.defaultValue}
+            />
+          );
+        })}
+      </div>
+    </div>
+  );
+};
 
 export default function NodeConfig() {
   const formRef = useRef();
@@ -261,7 +293,7 @@ export default function NodeConfig() {
                   </Col>
                 )}
                 <Col span={6}>
-                  <ProFormText rules={[requiredRule]} name="sshPort" label={'节点SSH端口'} />
+                  <ProFormDigit rules={[requiredRule]} name="sshPort" label={'节点SSH端口'} />
                 </Col>
                 {isUser && (
                   <Col span={24}>
@@ -282,32 +314,16 @@ export default function NodeConfig() {
           }}
         </ProFormDependency>
 
-        <div className={styles.horizontalForm}>
-          {portItemList.map((portItem) => {
-            return (
-              <ProFormDigit
-                {...{
-                  labelCol: { span: 6 },
-                  wrapperCol: { span: 18 },
-                }}
-                key={portItem.name[1]}
-                name={portItem.name}
-                label={portItem.label}
-                initialValue={portItem.defaultValue}
-              />
-            );
-          })}
-        </div>
-
         {nodeTypes.map((nodeType) => {
           return (
             <NodeFormList
               key={nodeType.key}
               nodeType={nodeType.key}
-              title={`${nodeType.title} 节点`}
+              title={`${nodeType.title} 节点:`}
             />
           );
         })}
+        <AdvancedConfig></AdvancedConfig>
       </div>
     </StepsForm.StepForm>
   );

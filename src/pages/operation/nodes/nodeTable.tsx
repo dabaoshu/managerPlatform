@@ -1,12 +1,10 @@
 import { useState } from 'react';
 import styles from './index.less';
-import { Table, Descriptions, Space, Popconfirm } from 'antd';
+import { Table, Descriptions, Space, Popconfirm, Badge } from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { LeftOutlined, RightOutlined, QuestionCircleOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import { useModel } from 'umi';
-import { useSetState } from 'ahooks';
-import { TriggerModal } from '@/components/triggerModal';
 import LogModal from './logModal';
 
 interface Irecord {
@@ -32,33 +30,60 @@ const ExpandAction = ({ children }) => {
     </div>
   );
 };
+const colorStatusMap = {
+  green: { status: 'success', text: '健康' },
+  red: { status: 'error', text: '离线' },
+  yellow: { status: 'warning', text: '亚健康' },
+};
+
+const ColorBudge = ({ color }) => {
+  const { status, text } = colorStatusMap[color];
+  return <Badge status={status} text={text} />;
+};
 
 export default function NodeTable({ title, data = [], nodeType }) {
-  const [{ currentCluster }] = useModel('clusterModel');
+  const [
+    {
+      currentCluster: { clusterName },
+    },
+  ] = useModel('clusterModel');
   const [{ loadingEffects }, { offlineClusterNode, onlineClusterNode }] =
     useModel('clusterRestart');
   const tableLoading = loadingEffects.offlineClusterNode || loadingEffects.onlineClusterNode;
 
   const handleActionClick = (type, record?: Irecord) => {
     switch (type) {
-      case 'start':
-      case 'reStart':
+      /**节点下的ip */
+      case 'ip-start':
+      case 'ip-reStart':
         onlineClusterNode({
-          clusterName: currentCluster.clusterName,
+          clusterName,
           role: nodeType,
           ip: record?.ip,
         });
         break;
-      case 'stop':
-        onlineClusterNode({
-          clusterName: currentCluster.clusterName,
+      case 'ip-stop':
+        offlineClusterNode({
+          clusterName,
           role: nodeType,
           ip: record?.ip,
         });
         break;
       case 'viewLog':
         break;
-
+      /**节点 */
+      case 'node-reStart':
+        onlineClusterNode({
+          clusterName,
+          role: nodeType,
+        });
+        break;
+      case 'node-stop':
+        offlineClusterNode({
+          clusterName,
+          role: nodeType,
+        });
+        break;
       default:
         break;
     }
@@ -67,7 +92,14 @@ export default function NodeTable({ title, data = [], nodeType }) {
   const columns: ColumnsType<Irecord> = [
     { title: 'IP', dataIndex: 'ip', key: 'ip' },
     { title: '角色', dataIndex: 'hostname', key: 'hostname' },
-    { title: '状态', dataIndex: 'status', key: 'status' },
+    {
+      title: '状态',
+      dataIndex: 'status',
+      key: 'status',
+      render: (v) => {
+        return <ColorBudge color={v} />;
+      },
+    },
     { title: '内存利用率', dataIndex: 'memoryUsage', key: 'memoryUsage' },
     { title: 'CPU 利用率', dataIndex: 'cpuUsage', key: 'cpuUsage' },
     { title: '磁盘利用率', dataIndex: 'diskUsage', key: 'diskUsage' },
@@ -76,27 +108,26 @@ export default function NodeTable({ title, data = [], nodeType }) {
     { title: '网络上传速率', dataIndex: 'networkUp', key: 'networkUp' },
     {
       className: styles.actions,
-      dataIndex: 'xx',
-      key: 'x',
+      dataIndex: 'oper',
+      key: 'oper',
       render: (v, r) => (
         <ExpandAction>
           <Popconfirm
             title={`确认启动${title} ${r.ip}`}
-            onConfirm={() => handleActionClick('start', r)}
-            // icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
+            onConfirm={() => handleActionClick('ip-start', r)}
           >
             <a>启动</a>
           </Popconfirm>
           <Popconfirm
             title={`确认停止${title} ${r.ip}`}
-            onConfirm={() => handleActionClick('stop', r)}
+            onConfirm={() => handleActionClick('ip-stop', r)}
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
           >
             <a>停止</a>
           </Popconfirm>
           <Popconfirm
             title={`确认重启${title} ${r.ip}`}
-            onConfirm={() => handleActionClick('reStart', r)}
+            onConfirm={() => handleActionClick('ip-reStart', r)}
             icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
           >
             <a>重启</a>
@@ -106,6 +137,7 @@ export default function NodeTable({ title, data = [], nodeType }) {
             trigger={<a>查看日志</a>}
             role={nodeType}
             ip={r.ip}
+            clusterName={clusterName}
           />
         </ExpandAction>
       ),
@@ -119,17 +151,17 @@ export default function NodeTable({ title, data = [], nodeType }) {
           <Space size={16}>
             <Popconfirm
               title={`确认停止${title}`}
-              onConfirm={() => handleActionClick('stop-node')}
+              onConfirm={() => handleActionClick('node-stop')}
               icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
             >
-              <a>重启</a>
+              <a> 停止</a>
             </Popconfirm>
             <Popconfirm
-              title={`确认停止${title}`}
-              onConfirm={() => handleActionClick('restart-node')}
+              title={`确认重启${title}`}
+              onConfirm={() => handleActionClick('node-restart')}
               icon={<QuestionCircleOutlined style={{ color: 'blue' }} />}
             >
-              <a> 停止</a>
+              <a>重启</a>
             </Popconfirm>
           </Space>
         </div>
@@ -148,21 +180,20 @@ export default function NodeTable({ title, data = [], nodeType }) {
                     layout="vertical"
                     items={[
                       {
-                        key: '1',
+                        key: 'cpu',
                         label: 'CPU',
                         style: {
                           width: '33%',
                         },
-
                         children: record.cpu,
                       },
                       {
-                        key: '2',
+                        key: 'memory',
                         label: '内存',
                         children: record.memory,
                       },
                       {
-                        key: '3',
+                        key: 'disk',
                         label: '硬盘',
                         children: record.disk,
                       },
@@ -172,6 +203,8 @@ export default function NodeTable({ title, data = [], nodeType }) {
               );
             },
           }}
+          size="small"
+          rowKey={'ip'}
           dataSource={data}
           pagination={false}
         />

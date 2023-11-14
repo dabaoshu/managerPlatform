@@ -51,7 +51,7 @@ const layoutSettings: LocalLayoutSettings = {
   slogan: '基于云原生、物理机等环境下,构建业界主流hadoop大数据平台', //另外加的
   iconfontUrl: '',
   navTheme: 'light',
-  colorPrimary: '#0065fd',
+  colorPrimary: token.colorPrimary,
   layout: 'side',
   contentWidth: 'Fluid',
   fixedHeader: false,

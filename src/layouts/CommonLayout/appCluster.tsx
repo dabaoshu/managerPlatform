@@ -19,7 +19,7 @@ export default function AppCluster({ children }) {
         const list = [];
         const infoList = [];
         Object.entries(data).forEach(([name, item]) => {
-          item.clusterConfig = item?.CK;
+          item.clusterConfig = item?.clickhouse;
           list.unshift(item.clusterConfig);
           infoList.unshift(item);
         });
@@ -40,8 +40,6 @@ export default function AppCluster({ children }) {
         setReady(true);
       }
     } catch (error) {
-      console.log('error', error);
-
       setState({ clusterList: [], clusterInfoList: [] });
       setReady(true);
       loginServer.logout(true);

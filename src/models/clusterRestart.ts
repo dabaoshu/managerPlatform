@@ -8,6 +8,7 @@ const useClusterRestart =
       onSuccess: (res, params) => {
         if (res.isSuccess) {
           savehideMsg(params)
+
         }
       },
     });

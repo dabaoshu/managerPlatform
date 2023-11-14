@@ -139,6 +139,7 @@ const AlarmList = [
 
 export default function AlarmNew() {
   const history = useHistory();
+  const create = async () => {};
   return (
     <CsPage>
       <CsHeader
@@ -158,15 +159,8 @@ export default function AlarmNew() {
         }
       />
       <CsContent>
-        <ProForm
-          submitter={{ searchConfig: { submitText: '确定' } }}
-          onFinish={async (values) => {
-            console.log(values);
-
-            return true;
-          }}
-        >
-          <ProFormText name={'name'} label="告警名称" />
+        <ProForm submitter={{ searchConfig: { submitText: '确定' } }} onFinish={create}>
+          <ProFormText name={'name'} width={'md'} label="告警名称" />
           <Form.Item label="触发条件">
             <Space size={8}>
               <div>最近</div>

@@ -111,6 +111,12 @@ export default defineConfig({
                 priority: -2,
                 enforce: true,
               },
+              // lodash: {
+              //   name: 'lodash',
+              //   test: /[\\/]node_modules[\\/]lodash[\\/]/,
+              //   priority: -2,
+              //   enforce: true,
+              // },
               vendors: {
                 name: 'vendors',
                 test({ resource }: any) {

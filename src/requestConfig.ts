@@ -68,12 +68,25 @@ const requestInterceptor = (url: string, options: RequestConfig) => {
   }
   // 从initialState中获取也可以
   // Authorization: `bearer ${initialState?.auth?.[0]?.id_token}`,    // 这里获取自己的token携带在请求头上
-  const headers = {
-    Accept: 'application/json',
-    'Content-Type': 'application/json',
-    [LOCAL_STORAGE.TOKEN]: loginServer.token || '',
-    ...(options.headers || {})
-  };
+  let headers = {}
+  console.log();
+
+  if (options.requestType !== "json") {
+    headers = {
+      Accept: '*/*',
+      // "Content-Type": "multipart/form-data",
+      [LOCAL_STORAGE.TOKEN]: loginServer.token || '',
+      ...(options.headers || {})
+    };
+
+  } else {
+    headers = {
+      Accept: 'application/json',
+      'Content-Type': 'application/json',
+      [LOCAL_STORAGE.TOKEN]: loginServer.token || '',
+      ...(options.headers || {})
+    };
+  }
 
   if (options.download) {
     options.responseType = 'blob'; // download设置responseType
@@ -120,6 +133,7 @@ const responseInterceptor = async (response: Response, options: RequestConfig) =
   }
   return response
 };
+
 
 export const hocResponse = <T>(
   response: API.BaseResponse<T>,
@@ -175,8 +189,6 @@ type responseHandleOptions = {
 const responseAdapterHandle = async <T>(ctx: Context, next: () => void) => {
   return (next as any)().then(() => {
     if (!ctx) return;
-    console.log(ctx);
-
     if (["5020", "5021", "5022"].includes(ctx?.res?.retCode)) {
       loginServer.logout(false)
     }
@@ -197,6 +209,9 @@ const responseHandle = async <T>(ctx: Context, next: () => void) => {
   })
 };
 
+
+
+
 // 统一的请求设定
 export const requestConfig: RequestConfig = {
   // parseResponse:false,
@@ -208,3 +223,41 @@ export const requestConfig: RequestConfig = {
   responseInterceptors: [responseInterceptor],
   middlewares: [responseHandle, responseAdapterHandle,]
 };
+
+
+
+
+// onProgress: (values: { loaded: number, total: number, percent: number, done: boolean }) => void
+
+export function uploadFile(url, options,) {
+  const { onProgress, data } = options
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener('progress', (event) => {
+      if (event.lengthComputable) {
+        const { loaded, total } = event
+        const progress = loaded / total;
+        onProgress({ progress, loaded, total, done: loaded === total });
+      }
+    });
+
+    xhr.onreadystatechange = () => {
+      if (xhr.readyState === XMLHttpRequest.DONE) {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          resolve(xhr.response);
+        } else {
+          reject(new Error(`File upload failed with status ${xhr.status}`));
+        }
+      }
+    };
+
+    xhr.open('POST', url, true);
+    xhr.setRequestHeader(LOCAL_STORAGE.TOKEN, loginServer.token)
+
+    // const formData = new FormData();
+    // formData.append('file', file);
+
+    // xhr.send(formData);
+    xhr.send(data);
+  });
+}

@@ -1,14 +1,15 @@
-import { useRef } from 'react';
+import { useMemo, useRef } from 'react';
 import { CsContent, CsHeader, CsPage } from '@/components/CsPage';
 import { Button, Space, Table, Tabs } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router';
 import styles from './index.less';
 import type { EditableFormInstance } from '@ant-design/pro-components';
-import { EditableProTable, ModalForm } from '@ant-design/pro-components';
+import { EditableProTable } from '@ant-design/pro-components';
 import { useMount, useRequest, useSetState } from 'ahooks';
 import { ClusterApi } from '@/services/cluster';
 import { useModel } from 'umi';
+import { ModalPrompt } from '@/utils/prompt';
 
 const LeftRender = () => {
   const history = useHistory();
@@ -55,24 +56,37 @@ const nodeParamItems = [
 ];
 export default function Parameter() {
   const editableFormRef = useRef<EditableFormInstance>();
-  const [{ tabKey, editType, dataSource, originDataSource, touchedList }, setState] = useSetState({
+  const [{ tabKey, editType, originDataSource, touchedList }, setState] = useSetState({
     tabKey: 'clusterParams',
     editType: false,
-    dataSource: [] as Param[],
     originDataSource: {} as Record<string, Param[]>,
     touchedList: [] as Param[],
   });
 
   const [{ currentCluster }] = useModel('clusterModel');
 
-  const getClusterFecth = useRequest(ClusterApi.getClusterConfig, {
-    onSuccess: (res) => {
-      if (res.isSuccess) {
-        console.log(res.data);
-      }
+  const { loading: getLoading, refresh: getClusterConfig } = useRequest(
+    ClusterApi.getClusterConfig,
+    {
+      onSuccess: (res) => {
+        if (res.isSuccess) {
+          console.log(res.data);
+        }
+      },
+      defaultParams: [currentCluster.clusterName],
     },
-    defaultParams: [currentCluster.clusterName],
-  });
+  );
+  const { loading: saveLoading, runAsync: saveClusterConfig } = useRequest(
+    ClusterApi.saveClusterConfig,
+    {
+      manual: true,
+      onSuccess: (res) => {
+        if (res.isSuccess) {
+          console.log(res.data);
+        }
+      },
+    },
+  );
 
   useMount(() => {
     const originDataSource = {
@@ -239,7 +253,6 @@ export default function Parameter() {
     };
     setState({
       originDataSource,
-      dataSource: originDataSource[tabKey],
     });
   });
 
@@ -251,8 +264,12 @@ export default function Parameter() {
 
   const onTabChange = (activeKey) => {
     onCancel();
-    setState({ tabKey: activeKey, dataSource: originDataSource[activeKey] || [] });
+    setState({ tabKey: activeKey });
   };
+
+  const dataSource = useMemo<Param[]>(() => {
+    return originDataSource[tabKey] || [];
+  }, [originDataSource, tabKey]);
 
   const checkEdit = () => {
     const values = editableFormRef.current.getFieldsValue();
@@ -270,6 +287,37 @@ export default function Parameter() {
     setState({
       touchedList: _list,
     });
+  };
+
+  const confirmContent = () => {
+    return (
+      <div>
+        <div className={styles.modalHeader}>
+          共修改<span>{touchedList.length}</span>个参数 修改需要重启{tabKey}
+          ，确认重启？
+        </div>
+        <div style={{ height: '50vh' }}>
+          <Table
+            size="small"
+            columns={[
+              {
+                title: '参数名',
+                dataIndex: 'paramName',
+              },
+              {
+                title: '当前值',
+                dataIndex: 'paramValue',
+              },
+              {
+                title: '更新值',
+                dataIndex: 'updatedParamValue',
+              },
+            ]}
+            dataSource={touchedList}
+          />
+        </div>
+      </div>
+    );
   };
 
   return (
@@ -345,49 +393,25 @@ export default function Parameter() {
           <div className={styles.right}>
             <Space size={8}>
               <Button onClick={onCancel}>取消</Button>
-              <ModalForm
-                title={`参数修改 `}
-                modalProps={{ bodyStyle: { paddingLeft: 32 } }}
-                trigger={
-                  <Button
-                    disabled={touchedList.length === 0}
-                    type="primary"
-                    // onClick={() => {
-                    //   console.log(editableFormRef.current);
-                    // }}
-                  >
-                    确认
-                  </Button>
-                }
-                onFinish={async (v) => {
-                  console.log(11, v);
-                  return false;
+              <Button
+                disabled={touchedList.length === 0}
+                onClick={() => {
+                  ModalPrompt({
+                    props: {
+                      title: '参数修改',
+                      bodyStyle: { paddingLeft: 32 },
+                      onOk: () => {
+                        saveClusterConfig(currentCluster.clusterName);
+                      },
+                    },
+                    component: confirmContent,
+                    data: {},
+                  });
                 }}
+                type="primary"
               >
-                <div className={styles.modalHeader}>
-                  共修改<span>{touchedList.length}</span>个参数 修改需要重启{tabKey}，确认重启？
-                </div>
-                <div>
-                  <Table
-                    columns={[
-                      {
-                        title: '参数名',
-                        dataIndex: 'paramName',
-                      },
-                      {
-                        title: '当前值',
-                        dataIndex: 'paramValue',
-                      },
-                      {
-                        title: '更新值',
-                        dataIndex: 'updatedParamValue',
-                      },
-                    ]}
-                    dataSource={touchedList}
-                    pagination={false}
-                  />
-                </div>
-              </ModalForm>
+                确认
+              </Button>
             </Space>
           </div>
         </div>

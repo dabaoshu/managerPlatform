@@ -16,7 +16,7 @@ export const ClusterApi = {
     }
   }),
   getClusterConfig: (clusterName: string) => {
-    return request<API.BaseRes>(`${url}/clusterconfig/${clusterName}`, {
+    return request<API.BaseRes>(`/api/v1/clusterconfig/${clusterName}`, {
       method: 'GET',
     });
   },
@@ -35,26 +35,29 @@ export const ClusterApi = {
   getinstances: (clusterName: string) => request<API.BaseRes>(`${url}/getinstances/${clusterName}`, {
     method: 'GET',
   }),
-  onlineClusterNode(payload: { clusterName?, ip?, role?}) {
-    return request<API.BaseRes>(`${url}/node/start`, {
+  onlineClusterNode({ clusterName, ip, role }: { clusterName?, ip?, role?}) {
+    return request<API.BaseRes>(`${url}/node/start/${clusterName}`, {
       method: "PUT",
-      data: payload
+      params: { ip, role },
     });
   },
-  offlineClusterNode(payload: { clusterName?, ip?, role?}) {
-    return request<API.BaseRes>(`${url}/node/stop`, {
+  offlineClusterNode({ clusterName, ip, role }: { clusterName?, ip?, role?}) {
+    return request<API.BaseRes>(`${url}/node/stop/${clusterName}`, {
       method: "PUT",
-      data: payload
+      params: { ip, role }
     });
   },
 
-  getNodeLog: ({ clusterName, ip, logType, lines = 1000, tail = true }) => {
-    return request<API.BaseRes>(`${url}/node/log/${clusterName}?ip=${ip}`, {
+  getNodeLog: ({ clusterName, ip, logType, role, lines = 1000, tail = true }) => {
+    return request<API.BaseRes>(`${url}/node/log/${clusterName}`, {
       method: "POST",
       data: {
         lines,
         logType,
         tail,
+      },
+      params: {
+        ip, role
       }
     });
   },
@@ -89,7 +92,10 @@ export const ClusterApi = {
     return request(`/api/v1/ui/schema?type=rebalance`);
   },
   importCluster(params) {
-    return request.post(`${url}/cluster`, params);
+    return request(`${url}/cluster`, {
+      method: "post",
+      data: params
+    });
   },
 
   updateCluster(params) {

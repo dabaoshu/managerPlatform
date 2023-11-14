@@ -1,4 +1,9 @@
-import { CheckCircleFilled, LogoutOutlined, PlusOutlined } from '@ant-design/icons';
+import {
+  CheckCircleFilled,
+  FilePptOutlined,
+  LogoutOutlined,
+  PlusOutlined,
+} from '@ant-design/icons';
 import { Badge, Divider, Popover, Space, Tooltip } from 'antd';
 import { useMemo, useState } from 'react';
 import styles from './index.less';
@@ -29,7 +34,8 @@ const ClusterItem = ({ item, active, onClick = () => {} }) => {
           <ClusterBadge item={item} className={styles['cluster-item-status']} />
         </div>
         <div className={styles['cluster-item-version']}>
-          {item.packageName}-{item.packageVersion}
+          {item.pkgName}
+          {item.packageVersion}
         </div>
       </div>
     </div>
@@ -89,6 +95,12 @@ export default function MenuHeader(props) {
               <div>新建 / 接管集群</div>
             </Space>
           </Link>
+          <Link to={'/pkgMgr'} onClick={hide} className={styles.action}>
+            <Space size={12}>
+              <FilePptOutlined />
+              <div>安装包管理</div>
+            </Space>
+          </Link>
           <div onClick={logout} className={styles.action}>
             <Space size={12}>
               <LogoutOutlined />
@@ -107,7 +119,7 @@ export default function MenuHeader(props) {
       open={open}
       onOpenChange={handleOpenChange}
       overlayStyle={{
-        width: '320px',
+        width: '340px',
       }}
       overlayInnerStyle={{
         padding: 0,

@@ -8,11 +8,11 @@ export const nodeTypes = [
     key: 'tsoNodes',
   },
   {
-    title: 'Resourcemanager',
+    title: 'resourcemanager',
     key: 'resourceManagerNodes',
   },
   {
-    title: 'Daemonmanager',
+    title: 'daemonmanager',
     key: 'daemonManagerNodes',
   },
   {
@@ -24,8 +24,12 @@ export const nodeTypes = [
     key: 'workerWriteNodes',
   },
   {
-    title: 'Fdb元数据',
+    title: 'fdb元数据',
     key: 'fdbNodes',
+  },
+  {
+    title: 'hdfs',
+    key: 'hdfshost',
   },
 ];
 // server/tso/resourcemanager/daemon/worker/worker-write/fdb

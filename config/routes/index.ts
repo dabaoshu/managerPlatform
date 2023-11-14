@@ -36,11 +36,17 @@ export interface MenuDataItem {
 
 const routes: MenuDataItem[] = [
   userRoutes,
-  // {
-  //   path: '/',
-  //   component: '@/layouts/CommonLayout/CommonTokenLayout',
-  //   routes: [userRoutes], exact: true
-  // },
+  {
+    path: '/test',
+    component: "@/layouts/CommonLayout/AntdConfigProvider",
+    exact: true,
+    routes: [
+      {
+        path: "/test",
+        component: './test',
+      }
+    ]
+  },
   // {
   //   name: '新建/接管集群',
   //   path: '/init',
@@ -168,6 +174,21 @@ const routes: MenuDataItem[] = [
         icon: 'FundProjectionScreenOutlined',
         path: '/sessionMgr',
         component: './sessionMgr',
+        hideChildrenInMenu: true,
+      },
+      {
+        name: '会话管理 ',
+        icon: 'FundProjectionScreenOutlined',
+        path: '/queryExecution',
+        component: './queryExecution',
+        hideChildrenInMenu: true,
+      },
+      {
+        name: '安装包管理 ',
+        icon: 'FundProjectionScreenOutlined',
+        path: '/pkgMgr',
+        component: './pkgMgr',
+        // hideInMenu: true, 
         hideChildrenInMenu: true,
       },
       { path: '/*', component: './404', }

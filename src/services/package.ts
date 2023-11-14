@@ -1,3 +1,4 @@
+import { uploadFile } from '@/requestConfig';
 import { request } from 'umi';
 
 
@@ -9,13 +10,36 @@ export const PackageApi = {
       method: 'GET',
     })
   },
-  // upload(params, opt) {
-  //   return axios.post(`${url}/package`, params, opt);
+  upload(data, onProgress) {
+    return uploadFile(`${url}/package`, {
+      method: "post",
+      requestType: "file",
+      handleResp: false,
+      data: data,
+      onProgress: onProgress
+    });
+  },
+  // upload(data) {
+  //   return request(`${url}/package`, {
+  //     method: "post",
+  //     requestType: "file",
+  //     handleResp: false,
+  //     body: data,
+  //     onProgress: (obj) => {
+  //       console.log(obj);
+
+  //     },
+  //   });
   // },
-  // deletePackage(params) {
-  //   return axios.delete(`${url}/package`, { params });
-  // },
-  // getVersion() {
-  //   return axios.get(`${url}/version`);
-  // },
+  deletePackage(params) {
+    return request(`${url}/package`, {
+      method: "delete",
+      params
+    });
+  },
+  getVersion() {
+    return request(`${url}/version`, {
+      method: "get"
+    });
+  },
 };

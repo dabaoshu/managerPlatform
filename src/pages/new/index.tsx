@@ -9,23 +9,44 @@ import { nodeTypes } from './utils';
 import { ClusterApi } from '@/services/cluster';
 import { App } from 'antd';
 import { useRef, useState } from 'react';
+import { Modal } from 'antd';
+import { ModalPrompt } from '@/utils/prompt';
+import { TaskDetail } from '../task/components/TaskDetail';
 
+const { confirm } = Modal;
 export default function NewCluster() {
   const { formatMessage } = useIntl();
+
   const history = useHistory();
   const { message } = App.useApp();
+
+  const openTaskDetailModal = (taskId) => {
+    return ModalPrompt({
+      props: {
+        title: '查看任务状态',
+        cancelText: false,
+        width: 800,
+      },
+      data: {
+        taskId: taskId,
+        refresh: true,
+      },
+      component: TaskDetail,
+    });
+  };
+
   const createCluester = async (values) => {
     const nodeValues = { ...values };
-
     nodeTypes.forEach(({ key }) => {
       nodeValues[key] = values[key]?.map((o) => o.ip);
     });
     try {
       ClusterApi.createCluster(nodeValues).then((res) => {
         if (res.isSuccess) {
-          message.success('创建成功');
-          history.push({
-            pathname: '/home',
+          const taskId = res.data;
+          openTaskDetailModal(taskId).then(() => {
+            message.success('创建成功');
+            history.go(-1);
           });
         }
       });

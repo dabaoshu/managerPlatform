@@ -87,7 +87,24 @@
   display: flex;
   align-items: center;
 }
+.border {
+  padding: 24px;
+  border: 0.5px solid rgb(204, 212, 226);
+  border-radius: 14px;
+}
 .horizontalForm {
+  margin-bottom: 24px;
+  .advance {
+    display: flex;
+    height: 32px;
+    .left {
+      font-weight: 600;
+      font-size: 18px;
+    }
+    .right {
+      margin-left: auto;
+    }
+  }
   :global {
     .ant-form-item-row {
       flex-direction: row;

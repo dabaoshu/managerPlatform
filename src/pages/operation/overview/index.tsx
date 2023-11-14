@@ -48,22 +48,18 @@ const ConnetCard = ({ data }) => {
   const columns = [
     {
       title: '访问方式',
-      dataIndex: 'way',
+      dataIndex: 'accessMethod',
     },
     {
       title: '访问地址',
-      dataIndex: 'age',
-      key: 'age',
+      dataIndex: 'address',
     },
     {
       title: '连接串',
-      dataIndex: 'address',
-      key: 'address',
+      dataIndex: 'connectString',
     },
   ];
-  const dataSource = useMemo(() => {
-    const list = [{ way: '' }];
-  }, [data]);
+
   return (
     <div className={styles.connectCard}>
       <div className={styles.title}>连接信息</div>
@@ -87,7 +83,7 @@ const BaseInfoCard = ({ data }) => {
     {
       key: '3',
       label: '运行时间',
-      children: data.run_time,
+      children: data.runTime,
     },
   ];
   return (
@@ -109,6 +105,10 @@ export default function Overview() {
     fdbStatics: {},
     dbCount: 0,
     tableCount: 0,
+    accessInfo: [],
+    createTime: '',
+    startTime: '',
+    runTime: '',
   });
   const { loading } = useRequest(ClusterApi.getstatics, {
     defaultParams: [currentCluster.clusterName],
@@ -173,7 +173,7 @@ export default function Overview() {
               </InfoCard>
             </Col>
           </Row>
-          {/* <ConnetCard data={data}></ConnetCard> */}
+          <ConnetCard data={data.accessInfo}></ConnetCard>
           <BaseInfoCard data={data}></BaseInfoCard>
         </div>
       </CsContent>
