@@ -1,11 +1,12 @@
-import { Tree, Input, Tooltip } from 'antd';
-import type { TreeProps, TreeDataNode, TooltipProps } from 'antd';
+import { Tree, Input, Tooltip, Spin } from 'antd';
+import type { TreeDataNode, TooltipProps } from 'antd';
 import styles from './index.less';
-import { useMemo, isValidElement, useState, useRef, useCallback, useLayoutEffect } from 'react';
+import type { FC } from 'react';
+import { useMemo, isValidElement, useRef, useLayoutEffect } from 'react';
 import type { SearchProps } from 'antd/es/input';
-import { defaultSwitcherIcon, generateList, getParentKey, getTreeMap } from './utils';
+import { getTreeMap } from './utils';
 import { useMergedState } from 'rc-util';
-import type { DataNode, DirectoryTreeProps } from 'antd/es/tree';
+import type { DirectoryTreeProps } from 'antd/es/tree';
 import classnames from 'classnames';
 import _ from 'lodash';
 import { useDebounceFn } from 'ahooks';
@@ -25,8 +26,9 @@ export type TooltipPropType<T> =
   | boolean;
 
 export interface CategoryTreeProps<T extends object = TreeDataNode> extends DirectoryTreeProps<T> {
+  loading?: boolean;
   /** 搜索输入栏相关配置 */
-  search?: OptionSearchProps;
+  search?: SearchPropType;
   /** 搜索输入栏背景 */
   placeholder?: string;
   /** 搜索回调 */
@@ -37,11 +39,12 @@ export interface CategoryTreeProps<T extends object = TreeDataNode> extends Dire
   onExpandedKeysChange?: (keys: React.Key[]) => void;
 }
 
-export const CategoryTree = ({
+export const CategoryTree: FC<CategoryTreeProps> = ({
   search,
   placeholder,
   onSearch,
   tooltip,
+  loading,
   treeData: defaultData,
   expandedKeys: _expandedKeys,
   defaultExpandedKeys,
@@ -51,13 +54,13 @@ export const CategoryTree = ({
   autoExpandParent: _autoExpandParent,
   onExpandedKeysChange,
   ...treeProps
-}: CategoryTreeProps) => {
+}) => {
   const [expandedKeys, setExpandedKeys] = useMergedState<React.Key[]>([], {
     defaultValue: defaultExpandedKeys,
     value: _expandedKeys,
   });
   const [searchValue, setSearchValue] = useMergedState<string>('', {
-    value: search && (search?.value as string),
+    value: search && ((search as OptionSearchProps)?.value as string),
   });
   const [autoExpandParent, setAutoExpandParent] = useMergedState(true, {
     value: _autoExpandParent,
@@ -72,15 +75,11 @@ export const CategoryTree = ({
     }
   }, []);
 
-  console.log(height, _height);
-
   const dataMap = useMemo(() => {
     return getTreeMap(defaultData);
   }, [defaultData]);
 
-  const searchKey = useMemo(() => {
-    return search?.searchKey || 'title';
-  }, [search?.searchKey]);
+  const searchKey = (search as OptionSearchProps)?.searchKey || 'title';
 
   const { run: onChange } = useDebounceFn(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -97,7 +96,7 @@ export const CategoryTree = ({
       setExpandedKeys(newExpandedKeys);
       if (onExpandedKeysChange) onExpandedKeysChange(newExpandedKeys);
       setSearchValue(value);
-      if (search?.onChange) search?.onChange(e);
+      if ((search as OptionSearchProps)?.onChange) (search as OptionSearchProps)?.onChange(e);
       setAutoExpandParent(!!value);
     },
     { wait: 300 },
@@ -186,17 +185,19 @@ export const CategoryTree = ({
         className={classnames(styles.treeWrap, { [styles.hasSearch]: !!SearchDom })}
         ref={treeBoxRef}
       >
-        <DirectoryTree
-          showIcon
-          onExpand={onExpand}
-          expandedKeys={expandedKeys}
-          autoExpandParent={false}
-          treeData={treeData}
-          height={height}
-          blockNode
-          titleRender={titleRender}
-          {...treeProps}
-        />
+        <Spin spinning={loading}>
+          <DirectoryTree
+            showIcon
+            onExpand={onExpand}
+            expandedKeys={expandedKeys}
+            autoExpandParent={false}
+            treeData={treeData}
+            height={height}
+            blockNode
+            titleRender={titleRender}
+            {...treeProps}
+          />
+        </Spin>
       </div>
     </div>
   );

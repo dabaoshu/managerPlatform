@@ -76,6 +76,7 @@ export default function NodeTable({ title, data = [], nodeType }) {
         onlineClusterNode({
           clusterName,
           role: nodeType,
+          ip: '',
         });
         break;
       case 'node-stop':
@@ -154,11 +155,11 @@ export default function NodeTable({ title, data = [], nodeType }) {
               onConfirm={() => handleActionClick('node-stop')}
               icon={<QuestionCircleOutlined style={{ color: 'red' }} />}
             >
-              <a> 停止</a>
+              <a>停止</a>
             </Popconfirm>
             <Popconfirm
               title={`确认重启${title}`}
-              onConfirm={() => handleActionClick('node-restart')}
+              onConfirm={() => handleActionClick('node-reStart')}
               icon={<QuestionCircleOutlined style={{ color: 'blue' }} />}
             >
               <a>重启</a>

@@ -32,7 +32,8 @@ export const ClusterApi = {
     method: 'GET',
   }),
   /* 节点管理*/
-  getinstances: (clusterName: string) => request<API.BaseRes>(`${url}/getinstances/${clusterName}`, {
+  getinstances: (clusterName: string, role) => request<API.BaseRes>(`${url}/getinstances/${clusterName}`, {
+    params: { role },
     method: 'GET',
   }),
   onlineClusterNode({ clusterName, ip, role }: { clusterName?, ip?, role?}) {
@@ -63,8 +64,11 @@ export const ClusterApi = {
   },
   // 获取节点列表的
   getClusterInfo: (clusterName: string, nodeType: string) => {
-    return request<API.BaseRes>(`${url}/get/${clusterName}/${nodeType}`, {
-      method: "get"
+    return request<API.BaseRes>(`${url}/get/${clusterName}`, {
+      method: "get",
+      params: {
+        role: nodeType
+      }
     })
   },
   // 创建集群
@@ -99,20 +103,26 @@ export const ClusterApi = {
   },
 
   updateCluster(params) {
-    return request.put(`${url}/cluster`, params);
+    return request(`${url}/cluster`, { method: "put", params });
   },
   deleteCluster(id) {
-    return request.delete(`${url}/cluster/${id}`);
+    return request(`${url}/cluster/${id}`, { method: "delete" });
   },
   manageCluster(type, params, password?) {
     const { clusterName, packageVersion, skip, policy } = params;
     if (!packageVersion) {
-      return request.put(`${url}/${type}/${clusterName}?password=${password || ''}`);
+      return request(`${url}/${type}/${clusterName}?password=${password || ''}`, {
+        method: 'put'
+      });
     } else {
-      return request.put(`${url}/${type}/${clusterName}?password=${password || ''}`, {
-        packageVersion,
-        skip,
-        policy,
+      return request(`${url}/${type}/${clusterName}?password=${password || ''}`, {
+        method: "put",
+        data: {
+          packageVersion,
+          skip,
+          policy,
+        }
+
       });
     }
   },

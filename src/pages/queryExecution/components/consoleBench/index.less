@@ -3,6 +3,18 @@
   flex-direction: column;
   height: 100%;
   min-height: 350px;
+  .toolbar {
+    display: flex;
+    height: 32px;
+    padding: 0 8px;
+    .toolbarRight {
+      margin-left: auto;
+    }
+  }
+  .editorBox {
+    height: calc(100% - 32px);
+    padding: 8px;
+  }
 }
 .bottomTabs {
   height: 100%;

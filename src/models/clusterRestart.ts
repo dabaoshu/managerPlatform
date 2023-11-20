@@ -3,6 +3,7 @@ import { useSetState, useRequest, useMount, useLocalStorageState } from "ahooks"
 // import { getUser } from "@/services/user";
 const useClusterRestart =
   () => {
+    /**start */
     const { loading: onlineLoading, runAsync: onlineClusterNode } = useRequest(ClusterApi.onlineClusterNode, {
       manual: true,
       onSuccess: (res, params) => {
@@ -12,6 +13,8 @@ const useClusterRestart =
         }
       },
     });
+
+    /**stop */
     const { loading: offlineLoading, runAsync: offlineClusterNode } = useRequest(
       ClusterApi.offlineClusterNode,
       {

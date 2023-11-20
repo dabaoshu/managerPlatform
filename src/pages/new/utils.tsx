@@ -1,3 +1,6 @@
+import { FileTextOutlined } from '@ant-design/icons';
+import { Badge, Space, Tooltip } from 'antd';
+import styles from './index.less';
 export const nodeTypes = [
   {
     title: 'server',
@@ -41,4 +44,17 @@ export const statusMap = {
   '3': { text: '服务拒绝连接', status: 'error' },
   default: { text: '待检测', status: 'default' },
   loading: { text: '检查中', status: 'processing' },
+};
+export const NodeStatus = ({ value }: { value?: { status: string; errText?: string } }) => {
+  const { status, text } = statusMap[value.status] || {};
+  return (
+    <Space className={styles.nodeStatusBox} size={8}>
+      <Badge status={status} text={text} />
+      {value.errText && (
+        <Tooltip title={value.errText}>
+          <FileTextOutlined />
+        </Tooltip>
+      )}
+    </Space>
+  );
 };

@@ -1,11 +1,12 @@
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
-import { Badge, Button } from 'antd';
+import { Button } from 'antd';
 import { useMemo, useRef } from 'react';
 import styles from './index.less';
 import { useIntl, useModel } from 'umi';
-import classNames from 'classnames';
 import { useRequest } from 'ahooks';
 import { SessionApi } from '@/services/session';
+import { TriggerModal } from '@/components/triggerModal';
+import { SqlEditor } from '@/components/sqlEditor';
 
 type SqlTableProps = {
   type: 'open' | 'close';
@@ -19,9 +20,9 @@ type SqlTableProps = {
 const KillBtn = ({ reload, record }) => {
   const { host, queryId } = record;
   const [{ currentCluster }] = useModel('clusterModel');
-  const { loading, run } = useRequest(SessionApi.kill, {
+  const { loading, run: kill } = useRequest(SessionApi.kill, {
     manual: true,
-    onSuccess(res, params) {
+    onSuccess(res) {
       if (res.isSuccess) {
         reload();
       }
@@ -32,8 +33,8 @@ const KillBtn = ({ reload, record }) => {
       key={'kill'}
       loading={loading}
       size="small"
-      type="text"
-      onClick={() => run(currentCluster.clusterName, { host, queryId })}
+      type="link"
+      onClick={() => kill(currentCluster.clusterName, { host, queryId })}
     >
       终止
     </Button>
@@ -68,7 +69,7 @@ export default function SqlSession({
           defaultMessage: 'SQL持续时间(ms)',
         }),
         dataIndex: 'queryDuration',
-        sorter: true,
+        sorter: (a, b) => a.queryDuration - b.queryDuration,
         width: 130,
       },
       {
@@ -77,10 +78,23 @@ export default function SqlSession({
           defaultMessage: 'SQL语句',
         }),
         dataIndex: 'query',
-        ellipsis: true,
-        sorter: true,
         width: 130,
-        copyable: true,
+        sorter: (a, b) => a.query - b.query,
+        render(dom, entity, index, action, schema) {
+          const { query } = entity;
+          return (
+            <TriggerModal
+              title="查看sql"
+              trigger={
+                <div className="ellipsis">
+                  <a>{query}</a>
+                </div>
+              }
+            >
+              <SqlEditor value={query} options={{ readOnly: true }} />
+            </TriggerModal>
+          );
+        },
       },
 
       {
@@ -90,7 +104,7 @@ export default function SqlSession({
         }),
         dataIndex: 'user',
         ellipsis: true,
-        sorter: true,
+        sorter: (a, b) => a.user - b.user,
         width: 130,
       },
 
@@ -101,7 +115,6 @@ export default function SqlSession({
         }),
         dataIndex: 'queryId',
         ellipsis: true,
-        sorter: true,
         width: 130,
       },
       {
@@ -111,7 +124,7 @@ export default function SqlSession({
         }),
         dataIndex: 'host',
         ellipsis: true,
-        sorter: true,
+        sorter: (a, b) => a.host - b.host,
         width: 130,
       },
       {
@@ -121,7 +134,7 @@ export default function SqlSession({
         }),
         dataIndex: 'address',
         ellipsis: true,
-        sorter: true,
+        sorter: (a, b) => a.address - b.address,
         width: 130,
       },
       {
@@ -131,7 +144,7 @@ export default function SqlSession({
         }),
         dataIndex: 'threads',
         ellipsis: true,
-        sorter: true,
+        sorter: (a, b) => a.threads - b.threads,
         width: 130,
       },
     ];

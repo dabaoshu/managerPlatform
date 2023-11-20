@@ -1,19 +1,23 @@
 import { CsContent, CsHeader, CsPage } from '@/components/CsPage';
-import React, { useMemo, useState } from 'react';
-import { Button, Space, Table, Tabs } from 'antd';
+import { useMemo } from 'react';
+import { Button, Space } from 'antd';
 import { LeftOutlined, ReloadOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import { useHistory, useParams } from 'react-router';
-import { EditableProTable, ProTable } from '@ant-design/pro-components';
+import { EditableProTable } from '@ant-design/pro-components';
 import { BatchIpCreateModal } from '@/pages/new/batchIpCreateModal';
-import { useMount, useRequest, useSetState } from 'ahooks';
+import { useRequest, useSetState } from 'ahooks';
 import { ClusterApi } from '@/services/cluster';
 import { useModel } from 'umi';
+import { NodeStatus } from '@/pages/new/utils';
+import LoadingIcon from '@/components/loadingIcon';
 
 interface RowData {
   status: string;
   ip: string;
   errText?: string;
+  readOnly?: boolean;
+  uuId?: string;
 }
 
 const getuuId = () => {
@@ -28,26 +32,38 @@ const getDefaultRow = () => {
   };
 };
 
-export default function Scaling(props) {
+export default function Scaling() {
   const history = useHistory();
-  const [{ currentCluster }] = useModel('clusterModel');
+  const [
+    {
+      currentCluster: { clusterName },
+    },
+  ] = useModel('clusterModel');
+  const [{}, { offlineClusterNode }] = useModel('clusterRestart');
   const { nodeType, type } = useParams<{ nodeType: string; type: 'down' | 'up' }>();
-  const isUp = type === 'up'; // 扩容
-  const [{ dataSource }, setState] = useSetState({
-    originDataSource: [],
+  /**扩容*/
+  const isUp = type === 'up';
+  const [{ dataSource, offlineLoading }, setState] = useSetState<{
+    dataSource: RowData[];
+    offlineLoading: Record<string, boolean>;
+  }>({
     dataSource: [],
+    offlineLoading: {},
   });
-  console.log(nodeType);
 
-  const { loading } = useRequest(ClusterApi.getClusterInfo, {
-    defaultParams: [currentCluster.clusterName, nodeType],
+  const { loading: tableLoading } = useRequest(ClusterApi.getinstances, {
+    defaultParams: [clusterName, nodeType],
     onSuccess: (res) => {
       if (res.isSuccess) {
         setState({
-          dataSource: res.data?.node?.map((o) => ({ ...o, readOnly: true })),
+          dataSource: res.data?.map((o) => ({ ...o, readOnly: true })),
         });
       }
     },
+  });
+
+  const { runAsync: checkhostFecth, loading: checkLoading } = useRequest(ClusterApi.checkhost, {
+    manual: true,
   });
 
   const batchCreateRecord = (newList = [getDefaultRow()]) => {
@@ -55,11 +71,6 @@ export default function Scaling(props) {
       dataSource: [...dataSource, ...newList],
     });
   };
-
-  const editableKeys = useMemo(() => {
-    return dataSource.filter((o) => !o.readOnly).map((o) => o.uuId);
-  }, [dataSource]);
-  console.log(editableKeys);
 
   const toolBarRender = () => {
     return isUp
@@ -92,9 +103,28 @@ export default function Scaling(props) {
       : [];
   };
 
-  const { title } = useMemo(() => {
-    return { title: `${nodeType}节点${isUp ? '扩容' : '缩容'}` };
-  }, [isUp, nodeType]);
+  const { title, editableKeys } = useMemo(() => {
+    return {
+      title: `${nodeType}节点${isUp ? '扩容' : '缩容'}`,
+      editableKeys: dataSource.filter((o) => !o.readOnly).map((o) => o.uuId),
+    };
+  }, [isUp, nodeType, dataSource]);
+
+  const checkHost = () => {
+    const needCheckList = dataSource.filter((o) => !o.readOnly).map((o) => o.ip);
+    setState({
+      dataSource: dataSource.map((o) => {
+        if (!o.readOnly) {
+          return {
+            ...o,
+            status: 'loading',
+          };
+        }
+        return o;
+      }),
+    });
+    checkhostFecth({ host: needCheckList, clusterName });
+  };
 
   return (
     <CsPage>
@@ -119,6 +149,7 @@ export default function Scaling(props) {
           cardProps={{
             bodyStyle: { padding: 0 },
           }}
+          loading={tableLoading}
           headerTitle={'节点列表'}
           rowKey="uuId" // uuId为临时id
           editable={{
@@ -133,20 +164,25 @@ export default function Scaling(props) {
             { title: 'IP', dataIndex: 'ip' },
             {
               title: (
-                <>
+                <Space size={8}>
                   节点状态
-                  <ReloadOutlined
-                    onClick={() => {
-                      console.log(111);
-                    }}
-                    className="cursor-pointer"
-                  />
-                </>
+                  <LoadingIcon loading={checkLoading}>
+                    <ReloadOutlined
+                      onClick={() => {
+                        checkHost();
+                      }}
+                      className="cursor-pointer"
+                    />
+                  </LoadingIcon>
+                </Space>
               ),
               editable: false,
-              dataIndex: 'statusInfo',
-              render: () => {
-                return <div>111</div>;
+              dataIndex: 'status',
+              render: (t, r) => {
+                if (r.readOnly) {
+                  return null;
+                }
+                return <NodeStatus value={r} />;
               },
             },
             {
@@ -169,14 +205,33 @@ export default function Scaling(props) {
                       </a>,
                     ]
                   : [
-                      <a
+                      <Button
                         key="down"
+                        type="link"
+                        loading={offlineLoading[record.ip]}
                         onClick={() => {
-                          console.log('下线');
+                          setState({
+                            offlineLoading: {
+                              ...offlineLoading,
+                              [record.ip]: true,
+                            },
+                          });
+                          offlineClusterNode({
+                            clusterName,
+                            role: nodeType,
+                            ip: record.ip,
+                          }).finally(() => {
+                            setState({
+                              offlineLoading: {
+                                ...offlineLoading,
+                                [record.ip]: false,
+                              },
+                            });
+                          });
                         }}
                       >
                         下线
-                      </a>,
+                      </Button>,
                     ];
               },
             },

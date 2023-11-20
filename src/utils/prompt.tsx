@@ -75,7 +75,8 @@ const PromptModal = memo<PromptModalProps & { children: any }>(
       open,
       confirmLoading,
       onOk: async (e) => {
-        destroy(await childRef?.current?.onOk?.());
+        setConfirmLoading(true);
+        destroy(await childRef?.current?.onOk?.()?.finally(() => setConfirmLoading(false)));
         setOpen(false);
         props?.onOk?.(e);
       },

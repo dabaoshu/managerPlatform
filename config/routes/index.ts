@@ -177,7 +177,7 @@ const routes: MenuDataItem[] = [
         hideChildrenInMenu: true,
       },
       {
-        name: '会话管理 ',
+        name: '查询管理 ',
         icon: 'FundProjectionScreenOutlined',
         path: '/queryExecution',
         component: './queryExecution',

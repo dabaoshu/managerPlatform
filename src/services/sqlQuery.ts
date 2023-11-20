@@ -4,7 +4,7 @@ const url = '/api/v1/ck';
 
 export const SqlQueryApi = {
   query(params) {
-    return request(`${url}/query/${params.clusterName}`, {
+    return request<API.BaseRes>(`${url}/query/${params.clusterName}`, {
       data: params,
       method: "GET",
       // transformResponse: [data => {
@@ -17,23 +17,23 @@ export const SqlQueryApi = {
     })
   },
   getTableLists(clusterName) {
-    return request(`${url}/table_lists/${clusterName}`, {
+    return request<API.BaseRes>(`${url}/table_lists/${clusterName}`, {
       method: "get"
     });
   },
   queryExplain(params) {
-    return request(`${url}/query_explain/${params.clusterName}`, {
+    return request<API.BaseRes>(`${url}/query_explain/${params.clusterName}`, {
       method: "get",
       params
     });
   },
   getHistory(clusterName) {
-    return request(`${url}/query_history/${clusterName}`, {
+    return request<API.BaseRes>(`${url}/query_history/${clusterName}`, {
       method: "get"
     });
   },
   deleteHistory({ clusterName, checksum }) {
-    return request(`${url}/query_history/${clusterName}?checksum=${checksum}`, {
+    return request<API.BaseRes>(`${url}/query_history/${clusterName}?checksum=${checksum}`, {
       method: "delete"
     });
   },

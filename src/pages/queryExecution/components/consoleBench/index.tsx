@@ -1,78 +1,149 @@
 import { SqlEditor } from '@/components/sqlEditor';
-import Splitter, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
-import { Button, Space, Tabs } from 'antd';
+import { Button, Form, Select, Space, Tabs, message } from 'antd';
 import styles from './index.less';
 import React from 'react';
 import type { editor } from 'monaco-editor';
-export class ConsoleBench extends React.Component {
-  state = {
-    sql: '',
-  };
+import { SqlQueryApi } from '@/services/sqlQuery';
+import Histoty from './histoty';
+import { format } from 'sql-formatter';
+import SplitPane, { Pane } from 'react-split-pane';
+import Result from './result';
+
+export class ConsoleBench extends React.Component<{ clusterName: string }> {
   sqlCodeEditor: editor.IStandaloneCodeEditor;
+  constructor(props) {
+    super(props);
 
-  run = () => {
-    // const selectSql = this.sqlCodeEditor.getSelection();
-    // const { sql, clusterName, selectHost } = this.state;
-    // if (!selectSql && !sql) {
-    //   $message.warning(this.$t('queryExecution.No Sql'));
-    //   return;
-    // }
-    // const start = new Date().getTime();
-    // const {
-    //   data: { entity },
-    // } = await SqlQueryApi[type === 'schedule' ? 'queryExplain' : 'query']({
-    //   clusterName,
-    //   query: selectSql || sql,
-    //   host: selectHost,
-    // }).finally(() => {
-    //   const end = new Date().getTime();
-    //   store.commit('sqlSelect/setStatus', '');
-    //   store.commit('sqlSelect/setDuration', end - start);
-    // });
+    this.state = {
+      sql: '',
+      selectHost: '',
+      hosts: [],
+    };
+  }
+  con;
+
+  componentDidMount(): void {
+    this.fetchNodeList();
+    window.addEventListener('keydown', this.handleKeydown);
+  }
+
+  componentWillUnmount(): void {
+    window.removeEventListener('keydown', this.handleKeydown);
+  }
+  handleKeydown = (e) => {
+    switch (e.key) {
+      case 'F8':
+        this.run();
+        break;
+      case 'F9':
+        this.run('schedule');
+        break;
+      case 'F10':
+        this.format();
+        break;
+    }
   };
 
-  editorDidMount = (editor) => {
-    this.sqlCodeEditor = editor;
+  fetchNodeList = () => {};
+
+  run = async (type = '') => {
+    const selectSql = this.sqlCodeEditor.getSelection();
+    const { clusterName, retrieveHistory, setResult, setStatus, setQueryDuration } = this.props;
+    const { sql, selectHost } = this.state;
+    if (!selectSql && !sql) {
+      message.warning('请输入sql语句');
+      return;
+    }
+    const start = new Date().getTime();
+    setStatus('running');
+    const { data, isSuccess } = await SqlQueryApi[type === 'schedule' ? 'queryExplain' : 'query']({
+      clusterName,
+      query: selectSql || sql,
+      host: selectHost,
+    }).finally(() => {
+      const end = new Date().getTime();
+      setStatus('');
+      setQueryDuration(end - start);
+    });
+    if (isSuccess) {
+      retrieveHistory(clusterName);
+      setResult(data);
+    }
+  };
+
+  format = () => {
+    const val = format(this.sqlCodeEditor.getValue(), {
+      language: 'sql',
+      tabWidth: 2,
+      keywordCase: 'upper',
+      linesBetweenQueries: 2,
+    });
+    this.sqlCodeEditor.setValue(val);
   };
 
   render() {
-    const { sql } = this.state;
+    const { sql, hosts, selectHost } = this.state;
+    const { clusterName } = this.props;
     return (
-      <Splitter direction={SplitDirection.Vertical} gutterTheme={GutterTheme.Light}>
-        <div className={styles.section}>
-          <Space>
-            <Button>执行查询</Button>
-            <Button>执行计划</Button>
-            <Button>格式化</Button>
-          </Space>
-          <SqlEditor
-            height={'100%'}
-            value={sql}
-            onChange={(val) => this.setState({ sql: val })}
-            editorDidMount={this.editorDidMount}
-          />
-        </div>
+      <SplitPane split="horizontal" minSize={350} defaultSize={450}>
+        <Pane>
+          <div className={styles.section}>
+            <div className={styles.toolbar}>
+              <Space>
+                <Button onClick={() => this.run()}>执行查询</Button>
+                <Button onClick={() => this.run('schedule')}>执行计划</Button>
+                <Button onClick={this.format}>格式化</Button>
+              </Space>
+              <div className={styles.toolbarRight}>
+                <Form.Item label={'节点'}>
+                  <Select
+                    style={{ width: 160 }}
+                    options={hosts}
+                    value={selectHost}
+                    onChange={(v) => this.setState({ selectHost: v })}
+                  />
+                </Form.Item>
+              </div>
+            </div>
+            <div className={styles.editorBox}>
+              <SqlEditor
+                height={'100%'}
+                value={sql}
+                onChange={(val) => this.setState({ sql: val })}
+                editorDidMount={(editor) => (this.sqlCodeEditor = editor)}
+                options={{}}
+              />
+            </div>
+          </div>
+        </Pane>
         <div>
           <Tabs
             rootClassName={styles.bottomTabs}
-            defaultActiveKey="1"
+            defaultActiveKey="history"
             items={[
               {
-                key: '1',
+                key: 'history',
                 label: '查询历史',
-                children: <div>1111</div>,
+                children: (
+                  <Histoty
+                    clusterName={clusterName}
+                    addSql={(str) => {
+                      this.sqlCodeEditor.setValue(`${sql}${sql ? '\n\n' : ''}${str}`);
+                    }}
+                  />
+                ),
                 className: styles.tabPane,
               },
               {
-                key: '2',
+                key: 'result',
                 label: '执行结果',
-                children: <div>1111</div>,
+                children: <Result clusterName={clusterName} />,
                 className: styles.tabPane,
               },
             ]}
           />
         </div>
-      </Splitter>
+      </SplitPane>
     );
   }
 }

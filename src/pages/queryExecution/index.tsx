@@ -1,28 +1,15 @@
-import React from 'react';
-import Splitter, { SplitDirection, GutterTheme } from '@devbookhq/splitter';
+import SplitPane, { Pane } from 'react-split-pane';
 import LeftAside from './components/LeftAside';
 import RightContant from './components/RightContant';
+import './styles.less';
+
 export default function QueryExecution() {
-  function handleResizeStarted(gutterIdx: number) {
-    console.log('Resize started!', gutterIdx);
-  }
-  function handleResizeFinished(gutterIdx: number, newSizes: number[]) {
-    console.log('Resize finished!', gutterIdx, newSizes);
-  }
   return (
     <div className="full-page">
-      <Splitter
-        direction={SplitDirection.Horizontal}
-        gutterTheme={GutterTheme.Light}
-        minWidths={[20, 60]}
-        onResizeStarted={handleResizeStarted}
-        onResizeFinished={handleResizeFinished}
-      >
+      <SplitPane split="vertical" minSize={180} defaultSize={230} primary="first">
         <LeftAside />
-        <Splitter direction={SplitDirection.Vertical} gutterTheme={GutterTheme.Light}>
-          <RightContant />
-        </Splitter>
-      </Splitter>
+        <RightContant />
+      </SplitPane>
     </div>
   );
 }

@@ -7,8 +7,8 @@ import {
   StepsForm,
 } from '@ant-design/pro-components';
 import styles from './index.less';
-import { Row, Col, Form, Badge, message, Tooltip, Space, Button } from 'antd';
-import { ReloadOutlined, DeleteOutlined, FileTextOutlined } from '@ant-design/icons';
+import { Row, Col, Form, message, Space, Button } from 'antd';
+import { ReloadOutlined, DeleteOutlined } from '@ant-design/icons';
 import classnames from 'classnames';
 import _ from 'lodash';
 import { useRequest } from 'ahooks';
@@ -16,25 +16,11 @@ import { ClusterApi } from '@/services/cluster';
 import { ipPattern } from '@/utils/regex';
 import { BatchIpCreateModal } from './batchIpCreateModal';
 import LoadingIcon from '@/components/loadingIcon';
-import { nodeTypes, statusMap } from './utils';
+import { NodeStatus, nodeTypes } from './utils';
 import { requiredRule } from '@/utils/form';
 import { useRef, useState } from 'react';
 
 const defaultValue = { ip: '', status: 'default' };
-
-const NodeStatus = ({ value }: { value?: { status: string; errText: string } }) => {
-  const { status, text } = statusMap[value.status];
-  return (
-    <Space className={styles.nodeStatusBox} size={8}>
-      <Badge status={status} text={text} />
-      {value.errText && (
-        <Tooltip title={value.errText}>
-          <FileTextOutlined />
-        </Tooltip>
-      )}
-    </Space>
-  );
-};
 
 const getWayType = (nodeVisitorWay) => {
   return {
@@ -49,7 +35,7 @@ const NodeFormList = ({ nodeType, title }) => {
     manual: true,
   });
 
-  const checkhost = (hosts) => {
+  const checkHost = (hosts) => {
     const { password, user, nodeVisitorWay, sshPort, savePassword } = form.getFieldsValue();
     const { userPassword, usePubkey } = getWayType(nodeVisitorWay);
     if (!(user && password && sshPort)) {
@@ -100,7 +86,7 @@ const NodeFormList = ({ nodeType, title }) => {
                       <ReloadOutlined
                         onClick={() => {
                           const hosts = form.getFieldValue(nodeType);
-                          checkhost(hosts);
+                          checkHost(hosts);
                         }}
                         className="cursor-pointer"
                       />

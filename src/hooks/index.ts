@@ -5,5 +5,6 @@ export { default as useSelectRows, useFlipSelectRows } from './useSelectRows';
 export { default as useLocalTable } from './useLocalTable';
 export * from './useHoverClick';
 export * from './useForm';
+export * from './useLoadings'
 
 

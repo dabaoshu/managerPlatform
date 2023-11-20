@@ -28,7 +28,9 @@ export function TriggerModal(props: TriggerModalProps) {
   });
 
   useEffect(() => {
-    onOpenMount(open);
+    if (onOpenMount) {
+      onOpenMount(open);
+    }
   }, [open]);
 
   const triggerDom = useMemo(() => {
@@ -57,10 +59,10 @@ export function TriggerModal(props: TriggerModalProps) {
     <>
       <Modal
         width={width || 800}
+        destroyOnClose={true}
         {...rest}
         open={open}
         onCancel={(e) => {
-          // 提交表单loading时，阻止弹框关闭
           setOpen(false);
           rest?.onCancel?.(e);
         }}
