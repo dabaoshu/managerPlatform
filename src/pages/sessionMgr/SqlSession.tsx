@@ -1,4 +1,5 @@
-import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { ProTable } from '@ant-design/pro-components';
 import { Button } from 'antd';
 import { useMemo, useRef } from 'react';
 import styles from './index.less';
@@ -80,7 +81,7 @@ export default function SqlSession({
         dataIndex: 'query',
         width: 130,
         sorter: (a, b) => a.query - b.query,
-        render(dom, entity, index, action, schema) {
+        render(dom, entity) {
           const { query } = entity;
           return (
             <TriggerModal
@@ -154,7 +155,7 @@ export default function SqlSession({
         title: '操作',
         dataIndex: 'oper',
         render: (text, record) => {
-          return [<KillBtn record={record} reload={reload} />];
+          return [<KillBtn key={'kill'} record={record} reload={reload} />];
         },
       });
     }
@@ -186,9 +187,7 @@ export default function SqlSession({
         }}
         dateFormatter="string"
         options={{
-          reload: () => {
-            reload();
-          },
+          reload: () => reload(),
         }}
       />
     </div>

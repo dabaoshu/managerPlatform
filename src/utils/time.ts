@@ -30,12 +30,11 @@ export function getLast7Days() {
   return date;
 }
 
-export function convertTimeBounds(timeFilter): { min: number, max: number } {
-  const [start, end] = timeFilter.map(o => o);
+export function convertTimeBounds(timeFilter: [dayjs.Dayjs, dayjs.Dayjs, number]): { start: number, end: number } {
+  const [start, end] = (timeFilter as dayjs.Dayjs[]).slice(0, 2).map(o => o?.valueOf());
 
   return {
-    min: start.timestamp,
-    max: end.timestamp,
-    // duration: moment.duration(end.timestamp - start.timestamp),
+    start, end,
+    // duration,
   };
 }

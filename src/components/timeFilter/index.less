@@ -14,12 +14,15 @@
     -webkit-box-align: center;
     -webkit-box-pack: justify;
   }
+  .timeFilterRealTitle {
+    cursor: pointer;
+  }
 }
 .TimeRangePopover {
   display: flex;
   justify-content: space-between;
   height: 260px;
-  margin: -16px;
+  margin: -12px;
   -webkit-box-pack: justify;
   .rangeSelect {
     width: 245px;
@@ -28,27 +31,35 @@
   }
   .fasterSelect {
     position: relative;
-    flex: 1 1 0%;
+    width: 120px;
     height: 100%;
     padding: 16px 8px;
     overflow: auto;
     color: rgb(32, 45, 64);
     border-left: 1px solid rgb(223, 229, 240);
-    .fasterSelectItem {
-      height: 34px;
-      padding: 0px 16px;
-      font-size: 14px;
-      line-height: 34px;
-      white-space: nowrap;
-      cursor: pointer;
-      &:hover {
-        color: rgb(0, 101, 253);
-        background-color: rgb(229, 240, 255);
-        border-radius: 6px;
-      }
-      &.selected {
-        color: rgb(0, 101, 253);
-      }
+  }
+  .realTimeSelect {
+    width: 220px;
+    padding: 16px 8px;
+    border-left: 1px solid rgb(223, 229, 240);
+    .realTimeBox {
+      display: flex;
+    }
+  }
+  .selectItem {
+    height: 34px;
+    padding: 0px 16px;
+    font-size: 14px;
+    line-height: 34px;
+    white-space: nowrap;
+    cursor: pointer;
+    &:hover {
+      color: rgb(0, 101, 253);
+      background-color: rgb(229, 240, 255);
+      border-radius: 6px;
+    }
+    &.selected {
+      color: rgb(0, 101, 253);
     }
   }
 }

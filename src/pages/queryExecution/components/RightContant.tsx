@@ -6,7 +6,6 @@ import { useModel } from 'umi';
 import { QueryExecutionConsumer, QueryExecutionContextProvider } from './consoleBench/context';
 
 export default function RightContant(props) {
-  console.log(props);
   const [
     {
       currentCluster: { clusterName },
@@ -22,18 +21,17 @@ export default function RightContant(props) {
           key: '1',
           label: '控制台',
           children: (
-            <QueryExecutionContextProvider>
-              <QueryExecutionConsumer>
-                {({ retrieveHistory, setResult, setStatus, setQueryDuration }) => (
-                  <ConsoleBench
-                    retrieveHistory={retrieveHistory}
-                    setResult={setResult}
-                    setStatus={setStatus}
-                    setQueryDuration={setQueryDuration}
-                  />
-                )}
-              </QueryExecutionConsumer>
-            </QueryExecutionContextProvider>
+            <QueryExecutionConsumer>
+              {({ retrieveHistory, setResult, setStatus, setQueryDuration }) => (
+                <ConsoleBench
+                  clusterName={clusterName}
+                  retrieveHistory={retrieveHistory}
+                  setResult={setResult}
+                  setStatus={setStatus}
+                  setQueryDuration={setQueryDuration}
+                />
+              )}
+            </QueryExecutionConsumer>
           ),
           className: styles.tabPane,
         },

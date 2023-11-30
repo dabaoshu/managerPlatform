@@ -3,8 +3,8 @@ import JSONbig from 'json-big';
 const url = '/api/v1/ck';
 
 export const SqlQueryApi = {
-  query(params) {
-    return request<API.BaseRes>(`${url}/query/${params.clusterName}`, {
+  query(clusterName, params) {
+    return request<API.BaseRes>(`${url}/query/${clusterName}`, {
       data: params,
       method: "GET",
       // transformResponse: [data => {
@@ -21,8 +21,8 @@ export const SqlQueryApi = {
       method: "get"
     });
   },
-  queryExplain(params) {
-    return request<API.BaseRes>(`${url}/query_explain/${params.clusterName}`, {
+  queryExplain(clusterName, params) {
+    return request<API.BaseRes>(`${url}/query_explain/${clusterName}`, {
       method: "get",
       params
     });

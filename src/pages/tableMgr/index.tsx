@@ -25,40 +25,6 @@ export default function TableMgr() {
   const { loading: tableLoading, refresh: fetchData } = useRequest(TablesApi.tableMetrics, {
     defaultParams: [clusterName],
     onSuccess: (res) => {
-      res.data = {
-        'BAS.BAS_PRD_JDYX_INFO_L': {
-          columns: 26,
-          rows: 0,
-          partitions: 0,
-          parts: 0,
-          compressed: 0,
-          uncompressed: 0,
-          readwrite_status: true,
-          completedQueries: 0,
-          failedQueries: 0,
-          queryCost: {
-            middle: 0,
-            secondaryMax: 0,
-            max: 0,
-          },
-        },
-        'BAS.BAS_PRD_JDYX_INFO_L2': {
-          columns: 26,
-          rows: 0,
-          partitions: 0,
-          parts: 0,
-          compressed: 0,
-          uncompressed: 0,
-          readwrite_status: false,
-          completedQueries: 0,
-          failedQueries: 0,
-          queryCost: {
-            middle: 0,
-            secondaryMax: 0,
-            max: 0,
-          },
-        },
-      };
       if (res.isSuccess) {
         const _list = Object.entries(res.data || []).map(([key, values]) => {
           values.readwrite_status = values?.readwrite_status?.toString().toUpperCase();

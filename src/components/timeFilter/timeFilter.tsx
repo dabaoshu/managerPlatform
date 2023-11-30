@@ -1,13 +1,21 @@
-import { forwardRef, useMemo, useImperativeHandle } from 'react';
+import { forwardRef, useMemo, useImperativeHandle, useState } from 'react';
 import styles from './index.less';
 import type { DatePickerProps } from 'antd';
-import { Button, DatePicker, Popover } from 'antd';
+import { Button, DatePicker, Popover, Row, Col, Space } from 'antd';
 import classnames from 'classnames';
-import { CalendarOutlined, ClockCircleOutlined, UpOutlined, DownOutlined } from '@ant-design/icons';
+import {
+  CalendarOutlined,
+  ClockCircleOutlined,
+  UpOutlined,
+  DownOutlined,
+  PauseOutlined,
+  CaretRightOutlined,
+} from '@ant-design/icons';
 import dayjs from 'dayjs';
 import { useMount, useSetState } from 'ahooks';
 import { useHoverClick } from '@/hooks';
 import { formatDate } from '@/utils/time';
+import _ from 'lodash';
 
 const fasterList = [
   {
@@ -30,6 +38,63 @@ const fasterList = [
     startShowLabel: '现在-1 周',
     endShowLabel: '现在',
   },
+];
+
+const realtimeList = [
+  [
+    {
+      label: '5秒',
+      value: 5 * 1000,
+    },
+    {
+      label: '10秒',
+      value: 10 * 1000,
+    },
+    {
+      label: '30秒',
+      value: 30 * 1000,
+    },
+    {
+      label: '45秒',
+      value: 30 * 1000,
+    },
+  ],
+  [
+    {
+      label: '1分种',
+      value: 1 * 60 * 1000,
+    },
+    {
+      label: '5分种',
+      value: 5 * 60 * 1000,
+    },
+    {
+      label: '15分种',
+      value: 15 * 60 * 1000,
+    },
+    {
+      label: '30分种',
+      value: 30 * 60 * 1000,
+    },
+  ],
+  [
+    {
+      label: '1小时',
+      value: 1 * 60 * 60 * 1000,
+    },
+    {
+      label: '2小时',
+      value: 2 * 60 * 60 * 1000,
+    },
+    {
+      label: '12小时',
+      value: 2 * 60 * 60 * 1000,
+    },
+    {
+      label: '1天',
+      value: 24 * 60 * 60 * 1000,
+    },
+  ],
 ];
 
 const getTimeState = (val) => {
@@ -59,7 +124,7 @@ type TimePickProps = DatePickerProps & {
   showLabel: string;
 };
 
-const TimePick = ({ label, showLabel, value, onChange, onOk, ...props }: TimePickProps) => {
+const TimePick = ({ label, showLabel, value, onChange, ...props }: TimePickProps) => {
   return (
     <div className={styles.timePick}>
       <div className={styles.PickLabel}>{label}</div>
@@ -76,7 +141,6 @@ const TimePick = ({ label, showLabel, value, onChange, onOk, ...props }: TimePic
           // @ts-expect-error
           showTime
           onChange={onChange}
-          onOk={onOk}
           {...props}
         />
       </div>
@@ -84,26 +148,56 @@ const TimePick = ({ label, showLabel, value, onChange, onOk, ...props }: TimePic
   );
 };
 
+export type TimeFilterRef = {
+  getValues: () => [dayjs.Dayjs, dayjs.Dayjs, number];
+  initValues: (value: any) => void;
+};
+
 export const TimeFilter = forwardRef<
-  { getValues: () => [dayjs.Dayjs, dayjs.Dayjs]; initValues: (value: any) => void },
+  TimeFilterRef,
   {
     defaultValue: number | [dayjs.Dayjs, dayjs.Dayjs];
-    onOk: (value: [dayjs.Dayjs, dayjs.Dayjs]) => void;
+    refreshDuration?: number;
+    onOk: (value: [dayjs.Dayjs, dayjs.Dayjs], duration: number) => void;
   }
->(({ defaultValue, onOk }, ref) => {
+>(({ defaultValue = 0, onOk, refreshDuration = 0 }, ref) => {
   const { clicked, hovered, handleHoverChange, handleClickChange, hide } = useHoverClick();
 
   const [
     { startValue, endValue, fasterValue, startShowLabel, endShowLabel, endPickerOpen },
     setTimeValue,
-  ] = useSetState({
-    startValue: undefined,
-    startShowLabel: '',
-    endValue: undefined,
-    endShowLabel: '',
-    fasterValue: undefined,
-    endPickerOpen: false,
+  ] = useSetState(() => {
+    const obj = {
+      endPickerOpen: false,
+      fasterValue: undefined,
+    };
+    if (typeof defaultValue === 'number') {
+      const data = getTimeState(defaultValue);
+      return {
+        ...obj,
+        ...data,
+      };
+    } else if (Array.isArray(defaultValue)) {
+      const [start, end] = defaultValue;
+      return {
+        ...obj,
+        startShowLabel: start ? formatDate(start) : '',
+        startValue: start ? start : undefined,
+        endValue: end ? end : undefined,
+        endShowLabel: end ? formatDate(end) : '',
+      };
+    }
+    return {
+      startValue: undefined,
+      startShowLabel: '',
+      endValue: undefined,
+      endShowLabel: '',
+      fasterValue: undefined,
+      endPickerOpen: false,
+    };
   });
+
+  const [duration, setDuration] = useState(refreshDuration);
 
   const { label, toolTipStart, toolTipEnd } = useMemo(() => {
     const fasterLabel = fasterList.find((o) => o.value === fasterValue)?.label;
@@ -138,7 +232,11 @@ export const TimeFilter = forwardRef<
     setTimeValue(data);
   };
 
-  const initValues = (val) => {
+  const onRealTimeChange = (val) => {
+    setDuration(val);
+  };
+
+  const initValues = (val, durationVal: number) => {
     if (typeof val === 'number') {
       onFasterSelectChange(val);
     } else if (Array.isArray(val)) {
@@ -150,28 +248,44 @@ export const TimeFilter = forwardRef<
         endShowLabel: end ? formatDate(end) : '',
       });
     }
+    onRealTimeChange(durationVal);
   };
 
-  const getRealValues: () => [dayjs.Dayjs, dayjs.Dayjs] = () => {
+  const getValues: () => [dayjs.Dayjs, dayjs.Dayjs, number] = () => {
     if (fasterValue) {
       const data = getTimeState(fasterValue);
-      return [data.startValue, data.endValue];
+      return [data.startValue, data.endValue, duration];
     }
-    return [startValue, endValue];
+    return [startValue, endValue, duration];
   };
 
   useImperativeHandle(ref, () => {
     return {
-      getValues: getRealValues,
+      getValues,
       initValues,
     };
   });
+
   useMount(() => {
-    initValues(defaultValue);
+    initValues(defaultValue, duration);
   });
 
+  const RealIcon = (props) =>
+    duration > 0 ? <CaretRightOutlined {...props} /> : <PauseOutlined {...props} />;
+  const RealLabel = useMemo(() => {
+    const list = _.flatten(realtimeList);
+    const i = list.find((item) => item.value === duration) || {};
+    return (
+      <Space onClick={() => onRealTimeChange(0)} className={styles.timeFilterRealTitle} size={4}>
+        <RealIcon />
+        <div>{i.label}</div>
+      </Space>
+    );
+  }, [duration]);
+
   return (
-    <div className={styles.timeFilter}>
+    <Space className={styles.timeFilter}>
+      {(clicked || duration > 0) && <div className={styles.timeFilterTitle}>{RealLabel}</div>}
       <Popover
         trigger="hover"
         open={hovered}
@@ -230,18 +344,19 @@ export const TimeFilter = forwardRef<
                   type="primary"
                   onClick={() => {
                     hide();
-                    onOk([startValue, endValue]);
+                    onOk([startValue, endValue], duration);
                   }}
                 >
                   确定
                 </Button>
               </div>
               <div className={styles.fasterSelect}>
+                <div>快速选择</div>
                 {fasterList.map((o) => {
                   const selected = o.value === fasterValue;
                   return (
                     <div
-                      className={classnames(styles.fasterSelectItem, {
+                      className={classnames(styles.selectItem, {
                         [styles.selected]: selected,
                       })}
                       key={o.value}
@@ -252,6 +367,36 @@ export const TimeFilter = forwardRef<
                   );
                 })}
               </div>
+              <section className={styles.realTimeSelect}>
+                <Space>
+                  实时刷新 <RealIcon></RealIcon>
+                </Space>
+                <div className={classnames(styles.selectItem)} onClick={() => onRealTimeChange(0)}>
+                  关闭实时
+                </div>
+                <Row className={styles.realTimeBox}>
+                  {realtimeList.map((cols, idx) => {
+                    return (
+                      <Col key={idx} span={8}>
+                        {cols.map((o) => {
+                          const selected = o.value === duration;
+                          return (
+                            <div
+                              className={classnames(styles.selectItem, {
+                                [styles.selected]: selected,
+                              })}
+                              key={o.value}
+                              onClick={() => onRealTimeChange(o.value)}
+                            >
+                              {o.label}
+                            </div>
+                          );
+                        })}
+                      </Col>
+                    );
+                  })}
+                </Row>
+              </section>
             </div>
           }
         >
@@ -262,6 +407,6 @@ export const TimeFilter = forwardRef<
           </div>
         </Popover>
       </Popover>
-    </div>
+    </Space>
   );
 });

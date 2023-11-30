@@ -21,28 +21,6 @@ const DataBaseTree = () => {
     onSuccess: (res) => {
       if (res.isSuccess) {
         const entity = res.data;
-        // const entity = {
-        //   db1: {
-        //     table1: {
-        //       column1: {},
-        //       column2: {},
-        //     },
-        //     table2: {
-        //       column1: {},
-        //       column2: {},
-        //     },
-        //   },
-        //   db2: {
-        //     table1: {
-        //       column1: {},
-        //       column2: {},
-        //     },
-        //     table2: {
-        //       column1: {},
-        //       column2: {},
-        //     },
-        //   },
-        // };
         const treeData = (Object.keys(entity) || []).map((dbName) => {
           const dbItem = entity[dbName];
           const db = {

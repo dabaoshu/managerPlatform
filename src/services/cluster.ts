@@ -15,8 +15,10 @@ export const ClusterApi = {
       ...payload
     }
   }),
+
+
   getClusterConfig: (clusterName: string) => {
-    return request<API.BaseRes>(`/api/v1/clusterconfig/${clusterName}`, {
+    return request<API.BaseRes>(`/api/v1/by/config/${clusterName}`, {
       method: 'GET',
     });
   },
@@ -48,7 +50,20 @@ export const ClusterApi = {
       params: { ip, role }
     });
   },
-
+  // 删除节点
+  deleteClusterNode(clusterName: string, params,) {
+    return request(`${url}/node/${clusterName}`, {
+      params,
+      method: 'delete'
+    });
+  },
+  // 增加节点
+  addClusterNode(clusterName: string, params,) {
+    return request(`${url}/node/${clusterName}`, {
+      body: params,
+      method: 'post'
+    });
+  },
   getNodeLog: ({ clusterName, ip, logType, role, lines = 1000, tail = true }) => {
     return request<API.BaseRes>(`${url}/node/log/${clusterName}`, {
       method: "POST",
@@ -76,6 +91,13 @@ export const ClusterApi = {
     return request<API.BaseRes>(`/api/v1/deploy/ck`, {
       data: params,
       method: "POST"
+    });
+  },
+  // 参数配置的ui
+  getClusterParamsUi(params) {
+    return request<API.BaseRes>(`/api/v1/ui/meta`, {
+      params,
+      method: "get"
     });
   },
 
@@ -133,12 +155,8 @@ export const ClusterApi = {
     );
   },
 
-  addClusterNode(id, params, force, password?) {
-    return request.post(`${url}/node/${id}?password=${password || ''}&force=${force}`, params);
-  },
-  deleteClusterNode(id, params, password?) {
-    return request.delete(`${url}/node/${id}?password=${password || ''}`, { params });
-  },
+
+
 
 
 };

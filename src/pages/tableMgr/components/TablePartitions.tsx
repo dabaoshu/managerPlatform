@@ -1,6 +1,6 @@
 import { Modal, Table } from 'antd';
 import { useState } from 'react';
-import moment from 'moment';
+import dayjs from 'dayjs';
 import { useRequest } from 'ahooks';
 import { TablesApi } from '@/services/tables';
 interface Partition {
@@ -22,8 +22,8 @@ export default function TablePartitions({ clusterName, tableName }) {
     onSuccess: (res) => {
       if (res.isSuccess) {
         const _list = (Object.entries(res.data) || []).map(([key, values]: [string, Partition]) => {
-          values.max_time = moment(values.max_time).format('YYYY-MM-DD HH:mm:SS');
-          values.min_time = moment(values.min_time).format('YYYY-MM-DD HH:mm:SS');
+          values.max_time = dayjs(values.max_time).format('YYYY-MM-DD HH:mm:SS');
+          values.min_time = dayjs(values.min_time).format('YYYY-MM-DD HH:mm:SS');
           values.rows = values.rows.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ','); // 加入数字千分位分隔符
           values.name = key;
           return values;
@@ -42,7 +42,7 @@ export default function TablePartitions({ clusterName, tableName }) {
       },
       onOk: async () => {
         const { min_time, table, database } = row;
-        const start = moment(min_time);
+        const start = dayjs(min_time);
         await TablesApi.deletePartition(clusterName, {
           database,
           tables: [table],

@@ -11,7 +11,7 @@ export const SessionApi = {
   close(name: string, params: { limit: number; start: number; end: number }) {
     return request<API.BaseRes>(`${url}/slow_sessions/${name}`, {
       method: "GET",
-      data: params,
+      params,
     });
   },
   kill(clusterName, params: { host: string; query_id: string }) {

@@ -26,11 +26,7 @@ export const QueryExecutionContextProvider: React.FC<{ children: React.ReactNode
   children,
 }) => {
   const [state, setConText] = useSetState({
-    historyList: [
-      { QuerySql: 'select * from a', CheckSum: 'a' },
-      { QuerySql: 'select * from a', CheckSum: 'a2' },
-      { QuerySql: 'select * from a', CheckSum: 'a3' },
-    ],
+    historyList: [],
     result: [],
     status: '',
     queryDuration: 0,

@@ -21,6 +21,13 @@ const useClusterRestart =
         manual: true,
       },
     );
+    /**delete */
+    const { loading: deleteLoading, runAsync: deleteClusterNode } = useRequest(
+      ClusterApi.deleteClusterNode,
+      {
+        manual: true,
+      },
+    );
 
     const [hiddenMsg, setMessage] = useLocalStorageState(
       'hiddenMsg',
@@ -64,7 +71,7 @@ const useClusterRestart =
     }
 
     const modelState = { ...state, loadingEffects }
-    const modelFn = { setState, onlineClusterNode, offlineClusterNode, clearHideMsg }
+    const modelFn = { setState, onlineClusterNode, deleteClusterNode, offlineClusterNode, clearHideMsg }
 
     return [modelState, modelFn] as [typeof modelState, typeof modelFn]
   };

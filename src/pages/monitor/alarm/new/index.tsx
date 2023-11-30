@@ -3,17 +3,18 @@ import {
   ProForm,
   ProFormDependency,
   ProFormDigit,
-  ProFormFieldSet,
-  ProFormList,
   ProFormSelect,
   ProFormText,
 } from '@ant-design/pro-components';
-import { Button, Form, Space, InputNumber, Input } from 'antd';
+import { Button, Form, Space, InputNumber, App } from 'antd';
 import { useHistory } from 'react-router';
-import { DeleteOutlined, LeftOutlined, ReloadOutlined } from '@ant-design/icons';
+import { DeleteOutlined, LeftOutlined } from '@ant-design/icons';
 import styles from './index.less';
 import classnames from 'classnames';
 import CardSelect from '@/components/cardSelect';
+import { useRequest } from 'ahooks';
+import { AlarmApi } from '@/services/alarm';
+import { useModel } from 'umi';
 
 const DigitItem = ({
   value = 0,
@@ -27,22 +28,38 @@ const DigitItem = ({
   return (
     <Space size={4}>
       <Button onClick={() => onChange(value - 1)}>-</Button>
-      <InputNumber onChange={onChange} controls={false} className={styles.number} value={value} />
+      <InputNumber
+        onChange={onChange}
+        min={0}
+        controls={false}
+        className={styles.number}
+        value={value}
+      />
       <Button onClick={() => onChange(value + 1)}>+</Button>
       {after}
     </Space>
   );
 };
 
+const metricList = [
+  'tso_down',
+  'worker_write_down',
+  'resource_manager_down',
+  'server_down',
+  'damon_manager_down',
+  'fdb_down',
+];
+
 const ConditionItem = ({
   name = '',
-  listFieldName = 'metrics',
   relationFieldName = 'relationField',
   relationList = [
     { label: '且', value: 'And' },
     { label: '或', value: 'Or' },
   ],
 }) => {
+  const form = Form.useFormInstance();
+
   const initialValue = { op: '>=', right_value: 50 };
   const Relation = ({ value, onChange }: any) => {
     return (
@@ -69,29 +86,35 @@ const ConditionItem = ({
   return (
     <div className={styles.condition1}>
       <div className={styles['condition-input-content']}>
-        <ProFormDependency name={[[name, listFieldName]]}>
-          {({ [name]: { [listFieldName]: list } }) => {
+        <ProFormDependency name={[[name]]}>
+          {({ [name]: list }) => {
             return (
-              <Form.Item noStyle name={[name, relationFieldName]} initialValue={'And'}>
+              <Form.Item noStyle name={[relationFieldName]} initialValue={'And'}>
                 {list?.length > 1 && <Relation />}
               </Form.Item>
             );
           }}
         </ProFormDependency>
 
-        <Form.List name={[name, listFieldName]} initialValue={[initialValue]}>
+        <Form.List name={[name]} initialValue={[initialValue]}>
           {(fields, { remove, add: originAdd }) => {
             add = originAdd;
+            const values = form.getFieldValue([name]) || [];
+            const metrics = values.map((o) => o.metric).filter((o) => !!o);
+            const List = metricList.filter((o) => !metrics.includes(o));
             return (
               <div className={styles['condition-content']}>
                 {fields.map(({ key, name: fieldName, ...restField }) => (
                   <div key={key} className={styles['condition-item']}>
                     <Space size={4}>
                       <ProFormSelect
+                        fieldProps={{
+                          style: { width: 260 },
+                        }}
                         name={[fieldName, 'metric']}
                         formItemProps={{ noStyle: true }}
                         {...restField}
-                        options={['OOO/11', 'jjj/lll', 'kkk']}
+                        options={List}
                       />
                       <ProFormSelect
                         name={[fieldName, 'op']}
@@ -131,15 +154,34 @@ const ConditionItem = ({
 
 const AlarmList = [
   { label: <div>邮箱</div>, value: 'Email', title: '邮箱-告警对象' },
-  { label: <div>企业微信群</div>, value: 'WeChat', title: '企业微信群机器人-Webhook' },
-  { label: <div>飞书群</div>, value: 'Lark', title: '飞书群机器人-Webhook' },
+  // { label: <div>企业微信群</div>, value: 'WeChat', title: '企业微信群机器人-Webhook' },
+  // { label: <div>飞书群</div>, value: 'Lark', title: '飞书群机器人-Webhook' },
   { label: <div>钉钉群 </div>, value: 'DingTalk', title: '钉钉群机器人-Webhook' },
-  { label: <div>Webhook</div>, value: 'Webhook', title: 'Webhook' },
+  // { label: <div>Webhook</div>, value: 'Webhook', title: 'Webhook' },
 ];
 
 export default function AlarmNew() {
+  const [
+    {
+      currentCluster: { clusterName },
+    },
+  ] = useModel('clusterModel');
   const history = useHistory();
-  const create = async () => {};
+  const { message } = App.useApp();
+  const { loading, runAsync } = useRequest(AlarmApi.createAlarm, {
+    manual: true,
+    onSuccess: (res) => {
+      if (res.isSuccess) {
+        message.success('创建成功');
+        history.push({ pathname: '/alarm/tactics', state: { refresh: true } });
+      }
+    },
+  });
+
+  const create = async (value) => {
+    runAsync(clusterName, value);
+    history.push({ pathname: '/monitor/alarm/tactics', state: { refresh: true } });
+  };
   return (
     <CsPage>
       <CsHeader
@@ -159,7 +201,11 @@ export default function AlarmNew() {
         }
       />
       <CsContent>
-        <ProForm submitter={{ searchConfig: { submitText: '确定' } }} onFinish={create}>
+        <ProForm
+          submitter={{ searchConfig: { submitText: '确定' } }}
+          loading={loading}
+          onFinish={create}
+        >
           <ProFormText name={'name'} width={'md'} label="告警名称" />
           <Form.Item label="触发条件">
             <Space size={8}>
@@ -188,7 +234,7 @@ export default function AlarmNew() {
               <div>， 满足以下条件 ：</div>
             </Space>
           </Form.Item>
-          <ConditionItem name="condition" listFieldName="metrics" relationFieldName="trigger" />
+          <ConditionItem name="condition" relationFieldName="trigger" />
           <Form.Item label="通知">
             <Form.Item name={'interval'} initialValue={0} noStyle>
               <DigitItem after="分钟" />

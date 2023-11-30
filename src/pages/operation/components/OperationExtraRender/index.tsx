@@ -5,14 +5,7 @@ import { useHistory } from 'react-router';
 import styles from './index.less';
 import { useSetState } from 'ahooks';
 import { useModel } from 'umi';
-
-const ClusterUpdateModal = ({ open, onCancel }) => {
-  return (
-    <Modal title={'集群升级'} open={open} onCancel={onCancel}>
-      集群升级
-    </Modal>
-  );
-};
+import { ModalPrompt } from '@/utils/prompt';
 
 const restartNodes = [
   // {
@@ -62,8 +55,7 @@ export const OperationExtraRender = () => {
   const [{ currentCluster }] = useModel('clusterModel');
 
   const history = useHistory();
-  const [{ clusterUpdateOpen, cluserRestartMenuOpen }, setState] = useSetState({
-    clusterUpdateOpen: false,
+  const [{ cluserRestartMenuOpen }, setState] = useSetState({
     cluserRestartMenuOpen: false,
   });
   const routePush = (pathname) => {
@@ -80,8 +72,10 @@ export const OperationExtraRender = () => {
         routePush('/operation/parameter');
         break;
       case 'clusterUpdate':
-        setState({
-          clusterUpdateOpen: true,
+        ModalPrompt({
+          props: { title: '集群升级' },
+          component: () => <div>111</div>,
+          data: {},
         });
         break;
 
@@ -99,12 +93,8 @@ export const OperationExtraRender = () => {
     }
   };
 
-  const handleScaling = (type, item) => {
-    if (type === 'up') {
-      routePush(`/operation/scaling/up/${item.key}`);
-    } else if (type === 'down') {
-      routePush(`/operation/scaling/down/${item.key}`);
-    }
+  const handleScaling = (item) => {
+    routePush(`/operation/scaling/${item.key}`);
   };
 
   return (
@@ -136,21 +126,12 @@ export const OperationExtraRender = () => {
                     <>
                       <div
                         className={styles.menuItem}
-                        key={`${o.key}_up`}
+                        key={o.key}
                         onClick={() => {
-                          handleScaling('up', o);
+                          handleScaling(o);
                         }}
                       >
-                        {o.key} 扩容
-                      </div>
-                      <div
-                        className={styles.menuItem}
-                        key={`${o.key}_down`}
-                        onClick={() => {
-                          handleScaling('down', o);
-                        }}
-                      >
-                        {o.key} 缩容
+                        {o.key} 管理
                       </div>
                     </>
                   );
@@ -201,12 +182,6 @@ export const OperationExtraRender = () => {
           </Button>
         </Popover>
       </Space>
-      {clusterUpdateOpen && (
-        <ClusterUpdateModal
-          onCancel={() => setState({ clusterUpdateOpen: false })}
-          open={clusterUpdateOpen}
-        />
-      )}
     </>
   );
 };

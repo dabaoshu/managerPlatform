@@ -36,6 +36,9 @@
     .ant-pro-card-body {
       padding: 0;
     }
+    .ant-form-vertical .ant-form-item-label > label::after {
+      visibility: inherit;
+    }
   }
 }
 
@@ -56,4 +59,31 @@
 }
 .modalHeader {
   padding: 8px 0;
+}
+
+.parameItem {
+  :global {
+    .ant-pro-form-list-creator-button-top {
+      margin-block-end: 0;
+    }
+    .ant-pro-form-list-action {
+      height: 24px;
+      line-height: 24px;
+      margin-block-end: 0;
+    }
+  }
+  &.obj {
+    margin-bottom: 16px;
+    // background: #ccc;
+    .proCardContent {
+      margin: 16px 32px 0;
+      // border-top: 1px solid rgba(5, 5, 5, 0.06);
+    }
+  }
+  &.arr {
+    // background: #eee;
+  }
+  .collapse {
+    margin-bottom: 8px;
+  }
 }

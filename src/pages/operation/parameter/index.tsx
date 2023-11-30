@@ -1,15 +1,16 @@
-import { useMemo, useRef } from 'react';
+import { useMemo } from 'react';
 import { CsContent, CsHeader, CsPage } from '@/components/CsPage';
-import { Button, Space, Table, Tabs } from 'antd';
+import { Button, Space, Table, Tabs, Form } from 'antd';
 import { LeftOutlined } from '@ant-design/icons';
 import { useHistory } from 'react-router';
 import styles from './index.less';
-import type { EditableFormInstance } from '@ant-design/pro-components';
-import { EditableProTable } from '@ant-design/pro-components';
+import { ProForm } from '@ant-design/pro-components';
 import { useMount, useRequest, useSetState } from 'ahooks';
 import { ClusterApi } from '@/services/cluster';
-import { useModel } from 'umi';
+import { useIntl, useModel } from 'umi';
 import { ModalPrompt } from '@/utils/prompt';
+import { generateList } from './utils';
+import ParameTree from './ParameTree';
 
 const LeftRender = () => {
   const history = useHistory();
@@ -36,34 +37,61 @@ interface Param {
   updatedParamValue?: any;
 }
 
-const nodeParamItems = [
-  {
-    label: '集群参数配置',
-    key: 'clusterParams',
-  },
-  {
-    label: 'TSO参数配置',
-    key: 'tsoParams',
-  },
-  {
-    label: '服务发现配置',
-    key: 'serviceDiscovery',
-  },
-  {
-    label: 'DM配置',
-    key: 'daemonManager',
-  },
-];
 export default function Parameter() {
-  const editableFormRef = useRef<EditableFormInstance>();
-  const [{ tabKey, editType, originDataSource, touchedList }, setState] = useSetState({
-    tabKey: 'clusterParams',
+  const { locale } = useIntl();
+  const [editableFormRef] = Form.useForm();
+  const [
+    {
+      currentCluster: { clusterName },
+    },
+  ] = useModel('clusterModel');
+
+  const [{ tabKey, uiConfig }, setState] = useSetState({
+    tabKey: undefined,
     editType: false,
     originDataSource: {} as Record<string, Param[]>,
-    touchedList: [] as Param[],
+    uiConfig: {},
+  });
+  const { loading: uiLoading } = useRequest(ClusterApi.getClusterParamsUi, {
+    defaultParams: [{ type: 'settings' }],
+    onSuccess: (res) => {
+      if (res.isSuccess && res.data) {
+        let obj = {};
+        try {
+          obj = JSON.parse(res.data);
+        } catch (error) {}
+
+        setState({
+          tabKey: obj[0]?.field_name,
+          uiConfig: obj,
+        });
+      }
+    },
   });
 
-  const [{ currentCluster }] = useModel('clusterModel');
+  const tabOption = useMemo(() => {
+    const isZh = locale === 'zh-CN';
+    const label = isZh ? 'label_zh' : 'label_en';
+    const desc = isZh ? 'description_zh' : 'description_en';
+    if (Array.isArray(uiConfig)) {
+      return uiConfig.map((o) => {
+        return {
+          label: o[label],
+          desc: o[desc],
+          key: o.field_name,
+        };
+      });
+    }
+    return [];
+  }, [uiConfig, locale]);
+
+  const uiList = useMemo(() => {
+    if (Array.isArray(uiConfig)) {
+      const target = uiConfig.filter((o) => o.field_name === tabKey);
+      return generateList(target);
+    }
+    return [];
+  }, [uiConfig, tabKey]);
 
   const { loading: getLoading, refresh: getClusterConfig } = useRequest(
     ClusterApi.getClusterConfig,
@@ -73,193 +101,25 @@ export default function Parameter() {
           console.log(res.data);
         }
       },
-      defaultParams: [currentCluster.clusterName],
+      defaultParams: [clusterName],
     },
   );
-  const { loading: saveLoading, runAsync: saveClusterConfig } = useRequest(
-    ClusterApi.saveClusterConfig,
-    {
-      manual: true,
-      onSuccess: (res) => {
-        if (res.isSuccess) {
-          console.log(res.data);
-        }
-      },
-    },
-  );
-
-  useMount(() => {
-    const originDataSource = {
-      clusterParams: [
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-        {
-          paramName: 'tcpPort',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'httpPort',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-        {
-          paramName: 'rpcPort',
-          paramValue: '8124',
-          paramType: '端口',
-          paramDesc: 'RPC端口',
-        },
-      ],
-      serviceDiscovery: [
-        {
-          paramName: 'serviceDiscovery',
-          paramValue: '9010',
-          paramType: '端口',
-          paramDesc: '客户端连接的服务TCP端口',
-        },
-        {
-          paramName: 'serviceDiscovery223',
-          paramValue: '8123',
-          paramType: '端口',
-          paramDesc: 'JDBC连接用的http端口',
-        },
-      ],
-    };
-    setState({
-      originDataSource,
-    });
-  });
+  const loading = uiLoading || getLoading;
+  // const { loading: saveLoading, runAsync: saveClusterConfig } = useRequest(
+  //   ClusterApi.saveClusterConfig,
+  //   {
+  //     manual: true,
+  //     onSuccess: (res) => {
+  //       if (res.isSuccess) {
+  //         console.log(res.data);
+  //       }
+  //     },
+  //   },
+  // );
 
   const onCancel = () => {
-    setState({ editType: false, touchedList: [] });
-
-    editableFormRef.current.resetFields();
+    setState({ editType: false });
+    editableFormRef.resetFields();
   };
 
   const onTabChange = (activeKey) => {
@@ -267,58 +127,7 @@ export default function Parameter() {
     setState({ tabKey: activeKey });
   };
 
-  const dataSource = useMemo<Param[]>(() => {
-    return originDataSource[tabKey] || [];
-  }, [originDataSource, tabKey]);
-
-  const checkEdit = () => {
-    const values = editableFormRef.current.getFieldsValue();
-
-    const _list: Param[] = [];
-
-    dataSource.forEach((o) => {
-      if (values[o.paramName]?.paramValue !== o.paramValue) {
-        _list.push({
-          ...o,
-          updatedParamValue: values[o.paramName].paramValue,
-        });
-      }
-    });
-    setState({
-      touchedList: _list,
-    });
-  };
-
-  const confirmContent = () => {
-    return (
-      <div>
-        <div className={styles.modalHeader}>
-          共修改<span>{touchedList.length}</span>个参数 修改需要重启{tabKey}
-          ，确认重启？
-        </div>
-        <div style={{ height: '50vh' }}>
-          <Table
-            size="small"
-            columns={[
-              {
-                title: '参数名',
-                dataIndex: 'paramName',
-              },
-              {
-                title: '当前值',
-                dataIndex: 'paramValue',
-              },
-              {
-                title: '更新值',
-                dataIndex: 'updatedParamValue',
-              },
-            ]}
-            dataSource={touchedList}
-          />
-        </div>
-      </div>
-    );
-  };
+  console.log(uiList);
 
   return (
     <CsPage>
@@ -326,96 +135,15 @@ export default function Parameter() {
       <Tabs
         activeKey={tabKey}
         onChange={onTabChange}
-        items={nodeParamItems}
+        items={tabOption}
         animated={false}
         className={styles.tabs}
-        tabBarExtraContent={
-          <div className={styles.tabExtra}>
-            <Button
-              type="primary"
-              disabled={editType}
-              onClick={() => {
-                setState({
-                  editType: true,
-                });
-              }}
-            >
-              修改
-            </Button>
-          </div>
-        }
       />
       <CsContent className={styles.parameterCsContent}>
-        <EditableProTable<Param>
-          editable={{
-            type: 'multiple',
-            editableKeys: editType ? dataSource.map((o) => o.paramName) : [],
-          }}
-          value={dataSource}
-          editableFormRef={editableFormRef}
-          rowKey="paramName"
-          recordCreatorProps={false}
-          columns={[
-            {
-              title: '参数名',
-              dataIndex: 'paramName',
-              editable: false,
-            },
-            {
-              title: '参数描述',
-              dataIndex: 'paramDesc',
-              editable: false,
-            },
-            {
-              title: '参数类别',
-              dataIndex: 'paramType',
-              editable: false,
-            },
-            {
-              valueType: 'text',
-              title: '参数值',
-              dataIndex: 'paramValue',
-              fieldProps: {
-                onBlur: () => {
-                  checkEdit();
-                },
-              },
-            },
-          ]}
-          pagination={false}
-        />
+        <ProForm layout="vertical" wrapperCol={{ span: 18 }} form={editableFormRef}>
+          <ParameTree ParamList={uiList} />
+        </ProForm>
       </CsContent>
-      {editType && (
-        <div className={styles.footer}>
-          <div className={styles.left}>
-            已修改<span>{touchedList.length}</span>个参数
-          </div>
-          <div className={styles.right}>
-            <Space size={8}>
-              <Button onClick={onCancel}>取消</Button>
-              <Button
-                disabled={touchedList.length === 0}
-                onClick={() => {
-                  ModalPrompt({
-                    props: {
-                      title: '参数修改',
-                      bodyStyle: { paddingLeft: 32 },
-                      onOk: () => {
-                        saveClusterConfig(currentCluster.clusterName);
-                      },
-                    },
-                    component: confirmContent,
-                    data: {},
-                  });
-                }}
-                type="primary"
-              >
-                确认
-              </Button>
-            </Space>
-          </div>
-        </div>
-      )}
     </CsPage>
   );
 }

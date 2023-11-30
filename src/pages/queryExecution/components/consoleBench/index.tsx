@@ -20,7 +20,6 @@ export class ConsoleBench extends React.Component<{ clusterName: string }> {
       hosts: [],
     };
   }
-  con;
 
   componentDidMount(): void {
     this.fetchNodeList();
@@ -56,11 +55,13 @@ export class ConsoleBench extends React.Component<{ clusterName: string }> {
     }
     const start = new Date().getTime();
     setStatus('running');
-    const { data, isSuccess } = await SqlQueryApi[type === 'schedule' ? 'queryExplain' : 'query']({
+    const { data, isSuccess } = await SqlQueryApi[type === 'schedule' ? 'queryExplain' : 'query'](
       clusterName,
-      query: selectSql || sql,
-      host: selectHost,
-    }).finally(() => {
+      {
+        query: selectSql || sql,
+        host: selectHost,
+      },
+    ).finally(() => {
       const end = new Date().getTime();
       setStatus('');
       setQueryDuration(end - start);

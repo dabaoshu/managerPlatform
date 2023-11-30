@@ -1,13 +1,30 @@
+import { AlarmApi } from '@/services/alarm';
 import { ActionType, ProColumns, ProTable } from '@ant-design/pro-components';
+import { useRequest } from 'ahooks';
 import { Input } from 'antd';
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
+import { useModel } from 'umi';
 
 export default function Tactics() {
+  const [
+    {
+      currentCluster: { clusterName },
+    },
+  ] = useModel('clusterModel');
+  const [list, setList] = useState([]);
+  const { loading } = useRequest(AlarmApi.getAlarm, {
+    defaultParams: [clusterName],
+    onSuccess: (res, params) => {
+      if (res.isSuccess) {
+        setList(res.data);
+      }
+      return res.data;
+    },
+  });
   const actionRef = useRef<ActionType>();
   const columns: ProColumns[] = [
     {
-      dataIndex: 'tableName',
-      // valueType: 'indexBorder',
+      dataIndex: 'name',
       title: '告警名称',
       width: 130,
     },
@@ -53,7 +70,7 @@ export default function Tactics() {
         editable={{
           type: 'multiple',
         }}
-        dataSource={[{ created_at: 'TRUE' }]}
+        dataSource={[list]}
         columnsState={{
           persistenceKey: 'alarm-Tactics',
           persistenceType: 'localStorage',
@@ -64,6 +81,7 @@ export default function Tactics() {
         toolbar={{
           search: <Input />,
         }}
+        loading={loading}
         rowKey="id"
         search={false}
         // options={{

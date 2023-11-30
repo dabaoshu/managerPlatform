@@ -1,4 +1,3 @@
-import React from 'react';
 import CommonTokenLayout from './CommonTokenLayout';
 import SideLayout from '../sideLayout';
 import AppCluster from './appCluster';

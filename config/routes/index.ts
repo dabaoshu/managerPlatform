@@ -108,7 +108,7 @@ const routes: MenuDataItem[] = [
             routes: [
               {
                 name: '扩容/缩容',
-                path: '/operation/scaling/:type/:nodeType',
+                path: '/operation/scaling/:nodeType',
                 component: './operation/scaling',
               },
               { path: '/*', component: './404', }
@@ -188,6 +188,14 @@ const routes: MenuDataItem[] = [
         icon: 'FundProjectionScreenOutlined',
         path: '/pkgMgr',
         component: './pkgMgr',
+        // hideInMenu: true, 
+        hideChildrenInMenu: true,
+      },
+      {
+        name: '设置',
+        icon: 'FundProjectionScreenOutlined',
+        path: '/setting',
+        component: './setting',
         // hideInMenu: true, 
         hideChildrenInMenu: true,
       },
